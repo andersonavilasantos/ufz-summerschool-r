@@ -404,3 +404,7 @@ came from lessons 01–04; the only new thing was chaining them into an analysis
 
 Keep this notebook as a **template**: swap in your own feature table this week and
 most of the code still applies.
+
+➡️ Want to see the whole thing written out, with every chunk filled in and all
+figures produced? Open **07 · Worked analysis** — the fully worked, read-and-run
+version of this capstone.

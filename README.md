@@ -9,9 +9,10 @@ Ecology and Biotechnology"* — UFZ, Leipzig.
 This repository is a **hands-on R refresher for biologists** — no prior
 programming experience required. In ~3 hours you go from *"what is a vector?"* to
 a complete microbial-ecology analysis: importing data, heavy wrangling with
-**dplyr / tidyr**, rich visualisation with **ggplot2**, and a guided capstone
-with a real ordination. Everything is taught on a **real, published human-gut
-microbiome dataset** so every concept connects to data you actually work with.
+**dplyr / tidyr**, rich visualisation with **ggplot2**, a guided **fill-in
+capstone** you complete yourself, and a **fully worked reference analysis** with a
+real ordination. Everything is taught on a **real, published human-gut microbiome
+dataset** so every concept connects to data you actually work with.
 
 > This R session is the companion to the parallel *Python* refresher. It is
 > **not** a translation — it is designed around R's strengths (the tidyverse and
@@ -77,7 +78,7 @@ Colab).
 | 02 | [Data frames & tibbles](notebooks/02_data_frames_tibbles.Rmd) | 25 | import with **readr**, `glimpse`/`summary`, columns, **factors**, the three data tables |
 | 03 | [Data wrangling (dplyr & tidyr)](notebooks/03_data_wrangling.Rmd) | 45 | `filter`/`select`/`mutate`/`arrange`, `group_by`+`summarise`, **joins**, `pivot_longer`/`pivot_wider` |
 | 04 | [Visualization (ggplot2)](notebooks/04_visualization_ggplot2.Rmd) | 40 | grammar of graphics: scatter, histogram, boxplot, bar/stacked, colour, **faceting**, themes, `ggsave` |
-| 05 | [Capstone project](notebooks/05_capstone_project.Rmd) | 45–60 | guided end-to-end analysis: clean → reshape → join → diversity → figures → ANOVA → **NMDS** → export |
+| 05 | [Capstone project](notebooks/05_capstone_project.Rmd) | 45–60 | **fill-in** guided analysis (blank chunks + collapsible solutions): clean → reshape → join → diversity → figures → ANOVA → **NMDS** → export |
 
 Every lesson opens with **learning objectives**, is full of runnable examples
 with **line-by-line comments** (so it can be taught straight from the chunks),
@@ -89,9 +90,16 @@ closes with a **recap**.
 | # | Lesson | When to use |
 |---|--------|-------------|
 | 06 | [Bonus — heatmaps, correlation, PCA](notebooks/06_bonus_heatmap_ordination.Rmd) | if the core session finishes early: an abundance **heatmap**, a phylum **correlation** map, and a **PCA** ordination — all CRAN-only |
+| 07 | [Worked analysis](notebooks/07_worked_analysis.Rmd) | the **fully worked, read-and-run** version of the capstone — every chunk written out, end-to-end (import → clean → wrangle → summarise → 3 figures → ANOVA → **NMDS** → export). Use as the instructor's live demo or as the capstone's worked solution |
 
-**Suggested flow:** teach **01–04** live; use **05** for the last ~45–60 min so
-participants *do* the analysis in pairs; keep **06** as a buffer / self-study.
+**Suggested flow:** teach **01–04** live; use **05** (fill-in capstone) for the
+last ~45–60 min so participants *do* the analysis in pairs; use **07** as the
+worked solution / live demo of the same analysis; keep **06** as a buffer /
+self-study.
+
+> **Two distinct capstone experiences** (mirroring the parallel Python course):
+> **05** is the *fill-in activity* students complete themselves; **07** is the
+> *fully worked reference analysis* they can read and run start to finish.
 
 > Pre-rendered HTML versions of each lesson sit next to the `.Rmd` files (open
 > `notebooks/*.html` in a browser). They are ignored by git by default so the
@@ -146,7 +154,8 @@ R 2026/
 ├── .gitignore
 ├── data/                      # committed CSVs + get_data.R + SOURCE.md
 ├── figures/                   # figures written by the lessons (git-ignored)
-└── notebooks/                 # 01–04 core, 05 capstone, 06 bonus (.Rmd + .html)
+└── notebooks/                 # 01–04 core, 05 fill-in capstone, 06 bonus,
+                               # 07 worked analysis (.Rmd + .html)
 ```
 
 ---
