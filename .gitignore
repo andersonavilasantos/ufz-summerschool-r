@@ -11,9 +11,8 @@
 notebooks/*_cache/
 notebooks/*_files/
 
-# Rendered HTML from the lessons (regenerate by knitting). Comment the next
-# line out if you WANT to commit the knitted HTML for offline viewing.
-notebooks/*.html
+# Rendered HTML from the lessons IS committed so participants can read the
+# lessons offline in a browser without knitting (self-contained files).
 
 # --- files produced by RUNNING the lessons / capstone ---
 notebooks/*.csv
