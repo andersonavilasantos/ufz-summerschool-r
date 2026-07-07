@@ -101,9 +101,9 @@ self-study.
 > **05** is the *fill-in activity* students complete themselves; **07** is the
 > *fully worked reference analysis* they can read and run start to finish.
 
-> Pre-rendered HTML versions of each lesson sit next to the `.Rmd` files (open
-> `notebooks/*.html` in a browser). They are ignored by git by default so the
-> repository stays light — see `.gitignore` if you want to commit them.
+> Pre-rendered HTML versions of each lesson sit next to the `.Rmd` files and are
+> **committed** with the course, so participants can open `notebooks/*.html` in a
+> browser and read a lesson (with all figures) without running R.
 
 ---
 
