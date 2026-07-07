@@ -1,0 +1,242 @@
+---
+title: "02 · Data frames & tibbles — importing the microbiome data"
+subtitle: "Trends in multi-omics data analysis for Microbial Ecology and Biotechnology — UFZ Leipzig"
+author: "Instructor: Anderson Santos"
+date: "R refresher session"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 2
+    theme: flatly
+    highlight: tango
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, comment = "#>")
+```
+
+## Learning objectives
+
+- Understand a **data frame / tibble**: a table of columns (variables) and rows (observations).
+- **Import** CSV data with `readr::read_csv()` and know why tibbles are friendly.
+- **Inspect** a dataset: `glimpse()`, `head()`, `summary()`, dimensions, column types.
+- Pull out single columns and turn text columns into **factors**.
+- Meet the three tables of our real dataset and how they connect.
+
+---
+
+## 0 · Setup — load packages and find the data
+
+Every lesson starts with this small chunk. It loads the packages we need and
+locates the `data/` folder whether you knit from the `notebooks/` folder or from
+the project root.
+
+```{r message=FALSE}
+library(readr)     # fast CSV import
+library(dplyr)     # data wrangling (we use a little here, a lot in lesson 03)
+library(tibble)    # modern data frames
+
+# Find the data folder from wherever this file is being run.
+data_dir <- if (file.exists("../data/sample_metadata.csv")) "../data" else "data"
+```
+
+> 📌 **Teaching note.** If someone gets a "file not found" error, it is almost
+> always the working directory. Opening the `.Rproj` fixes this by anchoring the
+> project root. The line above makes the lessons robust either way.
+
+---
+
+## 1 · The dataset we will use all session
+
+We use the **HITChip Atlas** — a *real, published* human-gut microbiome study of
+**1,006 healthy adults** (Lahti *et al.* 2014, *Nature Communications*). It comes
+as three linked tables, the classic shape of omics data:
+
+| Table | File | One row is… | Key columns |
+|-------|------|-------------|-------------|
+| **Sample metadata** | `sample_metadata.csv` | one participant/sample | `sample_id`, `age`, `sex`, `nationality`, `bmi_group`, `diversity_shannon` |
+| **Taxonomy** | `taxonomy.csv` | one bacterial genus | `genus`, `phylum`, `family` |
+| **Abundance** | `genus_abundance.csv` | one sample × 130 genera | `sample_id` + 130 abundance columns |
+
+`sample_id` links metadata ↔ abundance; `genus` links taxonomy ↔ abundance
+columns. We join them in lesson 03.
+
+---
+
+## 2 · Importing with `read_csv()`
+
+`readr::read_csv()` reads a comma-separated file into a **tibble** (a modern data
+frame). It prints a short message telling you the **type it guessed for each
+column** — always read that message.
+
+```{r}
+meta <- read_csv(file.path(data_dir, "sample_metadata.csv"))
+meta
+```
+
+Notice what a tibble does for you: it prints only the first 10 rows, shows the
+**dimensions** (`1,006 × 7`) and the **type under each column name**
+(`<chr>` = text, `<dbl>` = number). That saves you from flooding the console.
+
+> Base R has `read.csv()` too; `read_csv()` (with the underscore) is faster,
+> never silently turns text into factors, and gives that helpful type report.
+
+---
+
+## 3 · Inspecting a dataset
+
+Before analysing anything, *look* at it. These are the commands you will run
+first on every new table.
+
+```{r}
+dim(meta)        # rows, columns
+nrow(meta)       # number of rows (samples)
+ncol(meta)       # number of columns (variables)
+names(meta)      # the column names
+```
+
+`glimpse()` is the best single overview: it lists every column, its type, and
+the first few values — transposed so wide tables still fit.
+
+```{r}
+glimpse(meta)
+```
+
+`head()` / `tail()` show the first / last rows; `summary()` gives per-column
+statistics (and, crucially, counts of `NA`).
+
+```{r}
+head(meta, 4)
+summary(meta)
+```
+
+> 📌 **Teaching note.** Point at the `summary()` output for `age`: it lists
+> `NA's`. Real data is messy — this dataset genuinely has missing ages and sexes,
+> which we will handle honestly rather than hide.
+
+### Exercise 1
+
+Import `taxonomy.csv` into an object `taxonomy` and `genus_abundance.csv` into
+`abund`. For each, print its **dimensions** and run `glimpse()` (for `abund`,
+`glimpse()` will be long — that is fine).
+
+<details><summary><b>Solution</b> (click to expand)</summary>
+
+```{r message=FALSE}
+taxonomy <- read_csv(file.path(data_dir, "taxonomy.csv"))
+abund    <- read_csv(file.path(data_dir, "genus_abundance.csv"))
+
+dim(taxonomy)   # 130 x 3
+dim(abund)      # 1006 x 131 (sample_id + 130 genera)
+glimpse(taxonomy)
+```
+</details>
+
+```{r message=FALSE, include=FALSE}
+# (Loaded here so later chunks work even if the exercise was skipped.)
+taxonomy <- read_csv(file.path(data_dir, "taxonomy.csv"))
+abund    <- read_csv(file.path(data_dir, "genus_abundance.csv"))
+```
+
+---
+
+## 4 · Getting at columns
+
+A column is just a vector. Pull one out with `$` (or `[[ ]]`), then use anything
+you learned in lesson 01.
+
+```{r}
+mean(meta$age, na.rm = TRUE)     # average age (ignoring missing)
+range(meta$diversity_shannon)    # min and max diversity
+length(unique(meta$nationality)) # how many distinct regions?
+```
+
+`table()` counts the categories in a text column — your first look at group sizes.
+
+```{r}
+table(meta$nationality)   # samples per geographic region
+table(meta$bmi_group)     # samples per BMI class
+table(meta$sex, useNA = "ifany")  # include a count of missing sex
+```
+
+---
+
+## 5 · Turning text into factors
+
+The category columns (`sex`, `nationality`, `bmi_group`) are text right now. For
+grouping, ordered tables and plots, we convert them to **factors** and set a
+meaningful order for BMI (lean → morbidly obese, not alphabetical).
+
+```{r}
+# Convert with a sensible order for bmi_group.
+bmi_levels <- c("underweight", "lean", "overweight",
+                "obese", "severeobese", "morbidobese")
+
+meta <- meta |>
+  mutate(
+    sex         = factor(sex),
+    nationality = factor(nationality),
+    bmi_group   = factor(bmi_group, levels = bmi_levels)
+  )
+
+# Now the levels are ordered the way a clinician would read them.
+levels(meta$bmi_group)
+table(meta$bmi_group)      # counts respect that order
+```
+
+`mutate()` (from **dplyr**) adds or changes columns — we meet it properly next
+lesson; here it just lets us overwrite three columns cleanly.
+
+> 📌 **Teaching note.** Ordering a factor once, here, pays off repeatedly: every
+> later table and bar chart will list BMI groups in clinical order automatically.
+
+### Exercise 2
+
+(a) How many participants are in each `bmi_group` **after** ordering?
+(b) What is the **median** `diversity_shannon` across all samples?
+(c) Which `nationality` is the **most common** in the study?
+
+<details><summary><b>Solution</b> (click to expand)</summary>
+
+```{r}
+table(meta$bmi_group)                       # (a)
+median(meta$diversity_shannon)              # (b)
+sort(table(meta$nationality), decreasing = TRUE)[1]  # (c) CentralEurope
+```
+</details>
+
+---
+
+## 6 · A first peek at the abundance table
+
+The abundance table is **wide**: one row per sample, one column per genus. The
+HITChip measures *genus-like groups*, so many column names carry an "et rel."
+("and related") suffix, e.g. `Escherichia coli et rel.`. Let's confirm its shape
+and look at three of those groups for the first few samples.
+
+```{r}
+dim(abund)                              # 1006 samples x 131 columns
+abund[1:5, c("sample_id", "Akkermansia", "Escherichia coli et rel.",
+             "Bacteroides fragilis et rel.")]
+```
+
+Because column names contain characters like spaces, we wrap them in backticks or
+quote them when selecting — something we automate with **tidyr** in lesson 03 by
+reshaping this wide table into a tidy long one.
+
+---
+
+## Recap
+
+- A **tibble** is a friendly data frame: prints tidily, reports column types.
+- Import with `read_csv()`; **read the column-type message** it prints.
+- Inspect *before* analysing: `dim()`, `glimpse()`, `head()`, `summary()`.
+- A column is a vector — reach it with `$`; count categories with `table()`.
+- Convert category text to **factors** and set a meaningful **level order**.
+- Our data is three linked tables (metadata, taxonomy, abundance) joined by
+  `sample_id` and `genus`.
+
+**Next:** lesson **03** — the wrangling core: `filter`, `select`, `mutate`,
+`arrange`, `group_by`/`summarise`, **joins**, and `pivot_longer`/`pivot_wider`.

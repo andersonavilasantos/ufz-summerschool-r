@@ -1,0 +1,31 @@
+Creative Commons Attribution 3.0 Unported (CC BY 3.0)
+
+Copyright (c) 2026 Anderson Santos
+
+These teaching materials (the R Markdown lessons, README, scripts and
+documentation in this repository) are licensed under the Creative Commons
+Attribution 3.0 Unported License. You are free to share and adapt them for any
+purpose, provided you give appropriate credit.
+
+Full licence text: https://creativecommons.org/licenses/by/3.0/legalcode
+Human-readable summary: https://creativecommons.org/licenses/by/3.0/
+
+-------------------------------------------------------------------------------
+Dataset license (separate from the materials above)
+-------------------------------------------------------------------------------
+The microbiome dataset in data/ is the HITChip Atlas from:
+
+  Lahti L, Salojarvi J, Salonen A, Scheffer M, de Vos WM (2014).
+  Tipping elements in the human intestinal ecosystem.
+  Nature Communications 5:4344. https://doi.org/10.1038/ncomms5344
+  Data: Dryad, https://doi.org/10.5061/dryad.pk75d
+
+It is released under the Creative Commons Zero (CC0 1.0) public-domain
+dedication, which permits redistribution. Please cite the paper above when you
+use the data. See data/SOURCE.md for details.
+
+-------------------------------------------------------------------------------
+Attribution
+-------------------------------------------------------------------------------
+Prepared for the "Trends in multi-omics data analysis for Microbial Ecology and
+Biotechnology" Summer School (UFZ Leipzig), R refresher session.

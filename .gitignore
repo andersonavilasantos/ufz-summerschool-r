@@ -1,0 +1,29 @@
+# --- R session / project artifacts ---
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj.bak
+
+# --- knitr / rmarkdown render output ---
+*_cache/
+*_files/
+notebooks/*_cache/
+notebooks/*_files/
+
+# Rendered HTML from the lessons (regenerate by knitting). Comment the next
+# line out if you WANT to commit the knitted HTML for offline viewing.
+notebooks/*.html
+
+# --- files produced by RUNNING the lessons / capstone ---
+notebooks/*.csv
+figures/*.png
+figures/*.pdf
+
+# --- OS junk ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# NOTE: the data/ CSVs ARE committed on purpose — the HITChip Atlas dataset is
+# released under CC0, which permits redistribution. See data/SOURCE.md.

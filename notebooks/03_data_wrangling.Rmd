@@ -1,0 +1,371 @@
+---
+title: "03 · Data wrangling with dplyr & tidyr"
+subtitle: "Trends in multi-omics data analysis for Microbial Ecology and Biotechnology — UFZ Leipzig"
+author: "Instructor: Anderson Santos"
+date: "R refresher session"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 2
+    theme: flatly
+    highlight: tango
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, comment = "#>")
+```
+
+## Learning objectives
+
+This is the **core** of the session — the toolkit you will reuse all week.
+
+- Reshape the six **dplyr verbs**: `filter`, `select`, `mutate`, `arrange`,
+  `summarise`, and `group_by`.
+- Combine tables with **joins** (`left_join`).
+- Move between **wide** and **long** shapes with `pivot_longer` / `pivot_wider`.
+- Tidy text and factors with **stringr** and **forcats** along the way.
+- Put it together to compute a real result: **taxonomic composition per region**.
+
+---
+
+## 0 · Setup
+
+```{r message=FALSE}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(forcats)
+
+data_dir <- if (file.exists("../data/sample_metadata.csv")) "../data" else "data"
+
+meta     <- read_csv(file.path(data_dir, "sample_metadata.csv"))
+taxonomy <- read_csv(file.path(data_dir, "taxonomy.csv"))
+abund    <- read_csv(file.path(data_dir, "genus_abundance.csv"))
+
+# Order bmi_group once, as in lesson 02.
+bmi_levels <- c("underweight","lean","overweight","obese","severeobese","morbidobese")
+meta <- meta |> mutate(bmi_group = factor(bmi_group, levels = bmi_levels))
+
+glimpse(meta)
+```
+
+---
+
+## 1 · `filter()` — keep the rows you want
+
+`filter()` keeps rows that meet a condition. Conditions use `==`, `>`, `<`, `>=`,
+`!=`, and combine with `&` (and), `|` (or).
+
+```{r}
+# Participants from Scandinavia.
+meta |> filter(nationality == "Scandinavia")
+
+# Lean AND older than 50.
+meta |> filter(bmi_group == "lean", age > 50)   # comma = AND
+
+# High-diversity samples (Shannon > 6).
+meta |> filter(diversity_shannon > 6) |> nrow()
+```
+
+Two very common needs: dropping missing values and matching a **set** of values.
+
+```{r}
+meta |> filter(!is.na(age)) |> nrow()              # drop rows with missing age
+meta |> filter(nationality %in% c("US", "UKIE"))   # match any in a set
+```
+
+### Exercise 1
+
+Keep only participants who are **female**, from **CentralEurope**, and whose
+`age` is known. How many are there?
+
+<details><summary><b>Solution</b> (click to expand)</summary>
+
+```{r}
+meta |>
+  filter(sex == "female", nationality == "CentralEurope", !is.na(age)) |>
+  nrow()
+```
+</details>
+
+---
+
+## 2 · `select()` — keep the columns you want
+
+```{r}
+meta |> select(sample_id, age, bmi_group)      # just these columns
+meta |> select(-subject_id)                    # everything EXCEPT this one
+meta |> select(sample_id, starts_with("div"))  # helper: name starts with "div"
+```
+
+`rename()` changes a column name (`new = old`):
+
+```{r}
+meta |> rename(shannon = diversity_shannon) |> names()
+```
+
+---
+
+## 3 · `mutate()` — add or change columns
+
+`mutate()` creates new columns from existing ones. Every row is computed at once.
+
+```{r}
+meta <- meta |>
+  mutate(
+    # A simple age band using cut(): turns a number into a category.
+    age_band = cut(age,
+                   breaks = c(0, 30, 45, 60, 100),
+                   labels = c("<30", "30-44", "45-59", "60+")),
+    # A TRUE/FALSE flag for high diversity.
+    high_diversity = diversity_shannon > 5.8
+  )
+
+meta |> select(sample_id, age, age_band, diversity_shannon, high_diversity) |> head()
+```
+
+`stringr` helps when a column is **text**. Here we make a tidy, lower-case region
+label and a short code:
+
+```{r}
+meta <- meta |>
+  mutate(
+    region_label = str_replace_all(nationality, c("UKIE" = "UK & Ireland",
+                                                   "US"   = "United States")),
+    region_code  = str_sub(nationality, 1, 3) |> str_to_upper()  # first 3 letters
+  )
+
+meta |> select(nationality, region_label, region_code) |> distinct() |> head()
+```
+
+### Exercise 2
+
+Add a column `diversity_z` giving each sample's Shannon diversity as a
+**z-score** (subtract the mean, divide by the standard deviation). Then show the
+5 samples with the highest `diversity_z`.
+*Hint:* `mean(x)`, `sd(x)`, and `arrange(desc(...))` (next section).
+
+<details><summary><b>Solution</b> (click to expand)</summary>
+
+```{r}
+meta |>
+  mutate(diversity_z = (diversity_shannon - mean(diversity_shannon)) /
+                        sd(diversity_shannon)) |>
+  arrange(desc(diversity_z)) |>
+  select(sample_id, diversity_shannon, diversity_z) |>
+  head(5)
+```
+</details>
+
+---
+
+## 4 · `arrange()` — sort the rows
+
+```{r}
+meta |> arrange(age) |> head(3)            # youngest first
+meta |> arrange(desc(diversity_shannon)) |> head(3)  # most diverse first
+meta |> arrange(nationality, desc(age)) |> head(3)   # by region, then oldest
+```
+
+---
+
+## 5 · `group_by()` + `summarise()` — the heart of analysis
+
+This pattern answers almost every "…per group?" question. `group_by()` splits the
+data into groups; `summarise()` collapses each group to one row of statistics.
+
+```{r}
+# Average diversity and sample size PER nationality.
+meta |>
+  group_by(nationality) |>
+  summarise(
+    n            = n(),                              # count of samples
+    mean_shannon = mean(diversity_shannon),          # average diversity
+    mean_age     = mean(age, na.rm = TRUE)           # average age (skip NA)
+  ) |>
+  arrange(desc(mean_shannon))
+```
+
+Group by **two** variables for a cross-tabulated summary:
+
+```{r}
+meta |>
+  filter(!is.na(bmi_group)) |>
+  group_by(nationality, bmi_group) |>
+  summarise(n = n(), .groups = "drop") |>       # .groups="drop" ungroups after
+  head(8)
+```
+
+> 📌 **Teaching note.** `summarise()` is where biology appears: "mean diversity
+> per region", "richness per BMI class". Emphasise the mental model —
+> **split → apply → combine**.
+
+### Exercise 3
+
+For each `bmi_group` (excluding `NA`), report the number of samples and the
+**median** Shannon diversity, sorted from most to least diverse.
+
+<details><summary><b>Solution</b> (click to expand)</summary>
+
+```{r}
+meta |>
+  filter(!is.na(bmi_group)) |>
+  group_by(bmi_group) |>
+  summarise(n = n(), median_shannon = median(diversity_shannon)) |>
+  arrange(desc(median_shannon))
+```
+</details>
+
+---
+
+## 6 · Reshaping: `pivot_longer()` and `pivot_wider()`
+
+Our abundance table is **wide** (130 genus columns). Most tidyverse tools — and
+all of ggplot2 — prefer **long** (tidy) data: one row per *observation*. Here an
+observation is "one genus in one sample".
+
+```{r}
+abund_long <- abund |>
+  pivot_longer(
+    cols      = -sample_id,   # everything except the id becomes long
+    names_to  = "genus",      # old column NAMES go into this new column
+    values_to = "abundance"   # old cell VALUES go into this new column
+  )
+
+abund_long          # 1006 samples x 130 genera = 130,780 rows
+```
+
+Now every genus/sample pair is a row — perfect for joining, grouping and
+plotting. To go back the other way, `pivot_wider()` spreads a long table wide:
+
+```{r}
+abund_long |>
+  filter(genus %in% c("Akkermansia", "Escherichia coli et rel.")) |>
+  pivot_wider(names_from = genus, values_from = abundance) |>
+  head()
+```
+
+> 📌 **Teaching note.** "Long for computing and plotting, wide for reading and
+> matrices." This single idea unlocks most day-to-day omics wrangling.
+
+---
+
+## 7 · Joins — connecting tables
+
+`abund_long` knows the *genus* but not its *phylum*. The `taxonomy` table has
+that mapping. `left_join()` glues columns from `taxonomy` onto matching rows of
+`abund_long`, matching on the shared `genus` column.
+
+```{r}
+abund_tax <- abund_long |>
+  left_join(taxonomy, by = "genus")     # add phylum & family columns
+
+abund_tax |> select(sample_id, genus, phylum, abundance) |> head()
+```
+
+Now join the **sample metadata** too, matching on `sample_id`, so every row knows
+its participant's region and BMI group. This one tidy table combines all three
+files:
+
+```{r}
+full <- abund_tax |>
+  left_join(meta |> select(sample_id, nationality, bmi_group, age),
+            by = "sample_id")
+
+glimpse(full)
+```
+
+> 📌 **Teaching note.** `left_join` keeps every row of the *left* table and adds
+> matching info from the right. If a genus were missing from `taxonomy`, its
+> `phylum` would be `NA` — a quick way to catch mismatches.
+
+### Exercise 4
+
+Using `abund_tax`, compute the **total abundance per phylum** across the whole
+study, sorted from most to least abundant. Which phylum dominates the human gut
+here?
+*Hint:* `group_by(phylum)` then `summarise(total = sum(abundance))`.
+
+<details><summary><b>Solution</b> (click to expand)</summary>
+
+```{r}
+abund_tax |>
+  group_by(phylum) |>
+  summarise(total = sum(abundance)) |>
+  arrange(desc(total))
+# Firmicutes and Bacteroidetes dominate — the classic gut signature.
+```
+</details>
+
+---
+
+## 8 · Putting it together — composition per region
+
+Now we chain everything into one analysis: **the mean relative abundance of each
+phylum, per geographic region.** This is the kind of multi-step pipe you will
+write daily.
+
+```{r}
+composition <- full |>
+  # 1. per sample, total abundance (to make a relative abundance) and per phylum sum
+  group_by(sample_id, nationality, phylum) |>
+  summarise(phy_abund = sum(abundance), .groups = "drop") |>
+  # 2. within each sample, convert to a proportion (relative abundance)
+  group_by(sample_id) |>
+  mutate(rel_abund = phy_abund / sum(phy_abund)) |>
+  ungroup() |>
+  # 3. average those proportions within each region
+  group_by(nationality, phylum) |>
+  summarise(mean_rel = mean(rel_abund), .groups = "drop")
+
+# Show it as a readable wide table (regions as columns), in %.
+composition |>
+  mutate(mean_pct = round(mean_rel * 100, 1)) |>
+  select(phylum, nationality, mean_pct) |>
+  pivot_wider(names_from = nationality, values_from = mean_pct)
+```
+
+Read across a row to see how a phylum's share shifts between regions — a genuine
+ecological pattern, produced with the six verbs plus a join and two pivots. We
+**visualise** exactly this table in lesson 04.
+
+```{r include=FALSE}
+# Save for reuse / inspection.
+saveRDS(composition, file.path(tempdir(), "composition.rds"))
+```
+
+### Exercise 5 (challenge)
+
+Reorder the `phylum` factor by its **overall** mean relative abundance (most
+abundant first) using `forcats::fct_reorder()`, then show the composition table
+again. *Hint:* first compute an overall mean per phylum, or use `fct_reorder`
+directly on the long `composition` with `mean_rel`.
+
+<details><summary><b>Solution</b> (click to expand)</summary>
+
+```{r}
+composition |>
+  mutate(phylum = fct_reorder(phylum, mean_rel, .fun = sum, .desc = TRUE)) |>
+  arrange(phylum, nationality) |>
+  head(10)
+```
+</details>
+
+---
+
+## Recap
+
+- **`filter`** rows, **`select`** columns, **`mutate`** new columns,
+  **`arrange`** to sort.
+- **`group_by` + `summarise`** = split–apply–combine: the answer to every
+  "per-group" question.
+- **`pivot_longer` / `pivot_wider`** move between tidy-long and readable-wide.
+- **`left_join`** connects tables on a shared key (`genus`, `sample_id`).
+- **stringr** cleans text, **forcats** orders factors.
+- Chaining these with the pipe turns three raw files into a real result:
+  **phylum composition per region**.
+
+**Next:** lesson **04** — turn these tables into figures with **ggplot2**.

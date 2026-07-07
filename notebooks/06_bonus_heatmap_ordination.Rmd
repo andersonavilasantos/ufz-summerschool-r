@@ -1,0 +1,168 @@
+---
+title: "06 · Bonus — heatmaps, correlation & a PCA ordination"
+subtitle: "Trends in multi-omics data analysis for Microbial Ecology and Biotechnology — UFZ Leipzig"
+author: "Instructor: Anderson Santos"
+date: "R refresher session"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 2
+    theme: flatly
+    highlight: tango
+    df_print: paged
+    fig_width: 7
+    fig_height: 5
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, comment = "#>",
+                      message = FALSE, warning = FALSE,
+                      fig.align = "center", dpi = 110)
+```
+
+## Learning objectives (time-buffer lesson)
+
+Use this if the core session finishes early. You will:
+
+- Draw an **abundance heatmap** of top genera with `geom_tile()`.
+- Compute and visualise a **correlation** structure.
+- Run a **PCA** ordination with base R (`prcomp`) — no Bioconductor.
+
+All CRAN-only. Nothing here is new machinery — just new combinations.
+
+---
+
+## 0 · Setup
+
+```{r}
+library(readr); library(dplyr); library(tidyr)
+library(ggplot2); library(forcats); library(tibble)
+
+data_dir <- if (file.exists("../data/sample_metadata.csv")) "../data" else "data"
+meta     <- read_csv(file.path(data_dir, "sample_metadata.csv"))
+taxonomy <- read_csv(file.path(data_dir, "taxonomy.csv"))
+abund    <- read_csv(file.path(data_dir, "genus_abundance.csv"))
+
+ab_long <- abund |>
+  pivot_longer(-sample_id, names_to = "genus", values_to = "abundance") |>
+  left_join(taxonomy, by = "genus")
+```
+
+---
+
+## 1 · A heatmap of the most abundant genera
+
+**Idea:** pick the 20 most abundant genera overall, average their relative
+abundance per region, and draw a tile grid — colour = abundance.
+
+```{r heatmap, fig.height=6}
+# Top 20 genera by total abundance across the study.
+top_genera <- ab_long |>
+  group_by(genus) |>
+  summarise(total = sum(abundance)) |>
+  slice_max(total, n = 20) |>
+  pull(genus)
+
+# Mean relative abundance of those genera per region.
+heat <- ab_long |>
+  filter(genus %in% top_genera) |>
+  left_join(select(meta, sample_id, nationality), by = "sample_id") |>
+  group_by(sample_id) |>
+  mutate(rel = abundance / sum(abundance)) |>
+  group_by(nationality, genus) |>
+  summarise(mean_rel = mean(rel), .groups = "drop")
+
+ggplot(heat, aes(x = nationality,
+                 y = fct_reorder(genus, mean_rel, sum),
+                 fill = mean_rel)) +
+  geom_tile(colour = "white") +
+  scale_fill_viridis_c(option = "C", labels = scales::percent) +
+  labs(title = "Top 20 genera across regions",
+       x = NULL, y = NULL, fill = "Mean\nrel. abund.") +
+  theme_minimal(base_size = 11) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+```
+
+> 📌 **Teaching note.** `viridis` palettes are perceptually uniform and
+> colour-blind-friendly — a good default for heatmaps. `scale_fill_viridis_c()`
+> ships with ggplot2, no extra package needed.
+
+---
+
+## 2 · Correlation between the major phyla
+
+Do phyla trade off against each other across samples? Build a sample × phylum
+relative-abundance matrix and correlate the columns.
+
+```{r corr, fig.height=5}
+phy_wide <- ab_long |>
+  group_by(sample_id, phylum) |>
+  summarise(a = sum(abundance), .groups = "drop") |>
+  group_by(sample_id) |>
+  mutate(rel = a / sum(a)) |>
+  ungroup() |>                          # important: drop the sample_id grouping
+  select(sample_id, phylum, rel) |>
+  pivot_wider(names_from = phylum, values_from = rel, values_fill = 0)
+
+cmat <- cor(as.matrix(select(phy_wide, -sample_id)))
+round(cmat, 2)
+
+# Visualise the correlation matrix as a heatmap.
+as.data.frame(cmat) |>
+  rownames_to_column("phylum1") |>
+  pivot_longer(-phylum1, names_to = "phylum2", values_to = "r") |>
+  ggplot(aes(phylum1, phylum2, fill = r)) +
+  geom_tile(colour = "white") +
+  scale_fill_gradient2(low = "steelblue", mid = "white", high = "firebrick",
+                       midpoint = 0, limits = c(-1, 1)) +
+  labs(title = "Correlation between phyla (relative abundance)",
+       x = NULL, y = NULL, fill = "r") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+```
+
+The classic gut signal often appears here: **Firmicutes and Bacteroidetes**
+correlate negatively — as one rises, the other tends to fall.
+
+---
+
+## 3 · PCA ordination (base R `prcomp`)
+
+Principal Component Analysis summarises many correlated variables into a few
+axes. We ordinate samples by their phylum profile and colour by region.
+
+```{r pca, fig.height=5}
+mat <- phy_wide |> column_to_rownames("sample_id") |> as.matrix()
+
+pca <- prcomp(mat, scale. = TRUE)      # PCA on the phylum relative abundances
+var_expl <- round(100 * pca$sdev^2 / sum(pca$sdev^2), 1)   # % variance per axis
+
+scores <- as.data.frame(pca$x[, 1:2]) |>
+  rownames_to_column("sample_id") |>
+  left_join(select(meta, sample_id, nationality), by = "sample_id")
+
+ggplot(scores, aes(PC1, PC2, colour = nationality)) +
+  geom_point(alpha = 0.6, size = 1.6) +
+  stat_ellipse(level = 0.7) +
+  labs(title = "PCA of gut communities (phylum level)",
+       x = paste0("PC1 (", var_expl[1], "%)"),
+       y = paste0("PC2 (", var_expl[2], "%)"),
+       colour = "Region") +
+  theme_minimal()
+```
+
+> 📌 **Teaching note.** PCA (base R) and NMDS (from the capstone, via `vegan`) are
+> both ordinations. PCA is fast and linear; NMDS handles ecological
+> (Bray–Curtis) distances better. Showing both makes the concept stick.
+
+---
+
+## Recap
+
+- **`geom_tile()`** turns any summarised long table into a **heatmap**.
+- `cor()` + a diverging fill scale reveals **relationships between variables**.
+- **`prcomp()`** gives a quick PCA ordination — all base R + ggplot2, CRAN-only.
+
+That closes the R refresher. From here, everything in the week is *more* of the
+same verbs and plots on richer data. Well done!
