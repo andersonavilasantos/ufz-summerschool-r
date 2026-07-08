@@ -2906,25 +2906,27 @@ first chunk below live. Seeing a number appear in the console is the
 arrow <code>&lt;-</code> (read it as “gets”). Typing the object’s name
 prints it.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Store the number of samples in our dataset in an object called n_samples.</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>n_samples <span class="ot">&lt;-</span> <span class="dv">1006</span>          <span class="co"># &#39;&lt;-&#39; means: put 1006 into n_samples</span></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>n_samples                  <span class="co"># typing the name prints the value</span></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt; [1] 1006</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co"># You can compute with objects just like with raw numbers.</span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>n_taxa <span class="ot">&lt;-</span> <span class="dv">130</span></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>n_samples <span class="sc">*</span> n_taxa         <span class="co"># total cells in the abundance table</span></span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; [1] 130780</span></span></code></pre></div>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>n_samples <span class="ot">&lt;-</span> <span class="dv">1006</span>          <span class="co"># &#39;&lt;-&#39; is R&#39;s assignment arrow: put 1006 INTO n_samples</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>                           <span class="co"># (in R we use &#39;&lt;-&#39;, not &#39;=&#39;; think of it as &quot;gets&quot;)</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>n_samples                  <span class="co"># type an object&#39;s name on its own line -&gt; R prints it</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt; [1] 1006</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co"># Objects behave exactly like the values inside them, so we can compute with them.</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>n_taxa <span class="ot">&lt;-</span> <span class="dv">130</span>              <span class="co"># 130 bacterial genera measured in our study</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>n_samples <span class="sc">*</span> n_taxa         <span class="co"># samples x genera = total cells in the abundance table</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; [1] 130780</span></span></code></pre></div>
 <p>R has a few basic <strong>types</strong> of value. The function
 <code>class()</code> tells you which:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">class</span>(<span class="fl">3.14</span>)                <span class="co"># &quot;numeric&quot;  — numbers (with decimals)</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;numeric&quot;</span></span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">class</span>(<span class="dv">42</span><span class="dt">L</span>)                 <span class="co"># &quot;integer&quot;  — the L makes it a whole number</span></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;integer&quot;</span></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="fu">class</span>(<span class="st">&quot;Firmicutes&quot;</span>)        <span class="co"># &quot;character&quot;— text, always in quotes</span></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;character&quot;</span></span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="fu">class</span>(<span class="cn">TRUE</span>)                <span class="co"># &quot;logical&quot;  — TRUE / FALSE</span></span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; [1] &quot;logical&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># class() reveals the TYPE of a value — getting types wrong is a top beginner bug.</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">class</span>(<span class="fl">3.14</span>)                <span class="co"># &quot;numeric&quot;  -&gt; numbers (decimals); R&#39;s default number type</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;numeric&quot;</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="fu">class</span>(<span class="dv">42</span><span class="dt">L</span>)                 <span class="co"># &quot;integer&quot;  -&gt; a whole number; the trailing L forces integer</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;integer&quot;</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="fu">class</span>(<span class="st">&quot;Firmicutes&quot;</span>)        <span class="co"># &quot;character&quot;-&gt; text; ALWAYS wrapped in quotes, e.g. a taxon name</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;character&quot;</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="fu">class</span>(<span class="cn">TRUE</span>)                <span class="co"># &quot;logical&quot;  -&gt; TRUE / FALSE, the result of a yes/no test</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt; [1] &quot;logical&quot;</span></span></code></pre></div>
 <blockquote>
 <p>📌 <strong>Teaching note.</strong> Beginners mix up <code>=</code>
 and <code>&lt;-</code>. Both can assign, but the community convention is
@@ -2957,66 +2959,72 @@ holding the number <code>1523</code>. Then print each one’s
 <p>A <strong>vector</strong> is an ordered collection of values <em>of
 the same type</em>. You build one with <code>c()</code> (“combine”).
 Almost everything in R is a vector.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Five bacterial genera (a character vector).</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>genera <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Bacteroides&quot;</span>, <span class="st">&quot;Prevotella&quot;</span>, <span class="st">&quot;Faecalibacterium&quot;</span>,</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>            <span class="st">&quot;Escherichia&quot;</span>, <span class="st">&quot;Akkermansia&quot;</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>genera</span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Bacteroides&quot;      &quot;Prevotella&quot;       &quot;Faecalibacterium&quot; &quot;Escherichia&quot;     </span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; [5] &quot;Akkermansia&quot;</span></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co"># Their (made-up) abundances in one sample (a numeric vector).</span></span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>counts <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1820</span>, <span class="dv">640</span>, <span class="dv">2310</span>, <span class="dv">95</span>, <span class="dv">210</span>)</span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>counts</span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; [1] 1820  640 2310   95  210</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># c() = &quot;combine&quot;: glue values into a vector. All elements share ONE type.</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co"># Here: five common human-gut genera as a character (text) vector.</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>genera <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Bacteroides&quot;</span>, <span class="st">&quot;Prevotella&quot;</span>, <span class="st">&quot;Faecalibacterium&quot;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>            <span class="st">&quot;Escherichia&quot;</span>, <span class="st">&quot;Akkermansia&quot;</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>genera                    <span class="co"># print it: R shows the 5 elements in order</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Bacteroides&quot;      &quot;Prevotella&quot;       &quot;Faecalibacterium&quot; &quot;Escherichia&quot;     </span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; [5] &quot;Akkermansia&quot;</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co"># Their (made-up) abundances in one sample — a numeric vector, aligned to &#39;genera&#39;.</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>counts <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1820</span>, <span class="dv">640</span>, <span class="dv">2310</span>, <span class="dv">95</span>, <span class="dv">210</span>)   <span class="co"># element i is the count of genus i</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>counts</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; [1] 1820  640 2310   95  210</span></span></code></pre></div>
 <p>The magic of R: operations apply to <strong>every element at
 once</strong> (this is called <em>vectorisation</em>) — no loops
 needed.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>counts <span class="sc">*</span> <span class="dv">2</span>          <span class="co"># double every value</span></span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co">#&gt; [1] 3640 1280 4620  190  420</span></span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>counts <span class="sc">/</span> <span class="fu">sum</span>(counts)  <span class="co"># convert to proportions (each value / the total)</span></span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt; [1] 0.35862069 0.12610837 0.45517241 0.01871921 0.04137931</span></span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="fu">log</span>(counts)         <span class="co"># natural log of each value</span></span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; [1] 7.506592 6.461468 7.745003 4.553877 5.347108</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Vectorisation: the operation is applied to EVERY element at once, no loop needed.</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>counts <span class="sc">*</span> <span class="dv">2</span>            <span class="co"># multiply each count by 2 -&gt; a new 5-element vector</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co">#&gt; [1] 3640 1280 4620  190  420</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>counts <span class="sc">/</span> <span class="fu">sum</span>(counts)  <span class="co"># each count / the total = its proportion of the community</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt; [1] 0.35862069 0.12610837 0.45517241 0.01871921 0.04137931</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="fu">log</span>(counts)           <span class="co"># natural log of each value (common for skewed abundance data)</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt; [1] 7.506592 6.461468 7.745003 4.553877 5.347108</span></span></code></pre></div>
 <p>Handy summary functions work on the whole vector:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">length</span>(counts)   <span class="co"># how many elements?</span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt; [1] 5</span></span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="fu">sum</span>(counts)      <span class="co"># total</span></span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt; [1] 5075</span></span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="fu">mean</span>(counts)     <span class="co"># average</span></span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt; [1] 1015</span></span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="fu">max</span>(counts)      <span class="co"># largest</span></span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; [1] 2310</span></span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="fu">min</span>(counts)      <span class="co"># smallest</span></span>
-<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; [1] 95</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># These reductions take the whole vector and return a single summary number.</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">length</span>(counts)   <span class="co"># how many elements (here: how many genera)?</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co">#&gt; [1] 5</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="fu">sum</span>(counts)      <span class="co"># total read count across all genera</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; [1] 5075</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="fu">mean</span>(counts)     <span class="co"># average count per genus</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; [1] 1015</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="fu">max</span>(counts)      <span class="co"># the largest count (the most abundant genus)</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; [1] 2310</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="fu">min</span>(counts)      <span class="co"># the smallest count (the rarest genus)</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; [1] 95</span></span></code></pre></div>
 <div id="indexing-picking-elements" class="section level3">
 <h3>2.1 · Indexing (picking elements)</h3>
 <p>R counts <strong>from 1</strong> (not 0). Use square brackets
 <code>[ ]</code> to pick elements.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>genera[<span class="dv">1</span>]            <span class="co"># the first genus</span></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Bacteroides&quot;</span></span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>genera[<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>)]      <span class="co"># the first and third</span></span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Bacteroides&quot;      &quot;Faecalibacterium&quot;</span></span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>counts[counts <span class="sc">&gt;</span> <span class="dv">500</span>] <span class="co"># keep only counts above 500 (a logical filter!)</span></span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; [1] 1820  640 2310</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Square brackets pick elements by position. R starts counting at 1 (not 0!).</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>genera[<span class="dv">1</span>]            <span class="co"># the 1st genus (&quot;Bacteroides&quot;)</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Bacteroides&quot;</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>genera[<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>)]      <span class="co"># pass a vector of positions -&gt; the 1st and 3rd genera</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Bacteroides&quot;      &quot;Faecalibacterium&quot;</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>counts[counts <span class="sc">&gt;</span> <span class="dv">500</span>] <span class="co"># logical filter: keep only the counts greater than 500</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; [1] 1820  640 2310</span></span></code></pre></div>
 <p>That last line is powerful: <code>counts &gt; 500</code> produces
 <code>TRUE/FALSE</code>, and R keeps the <code>TRUE</code> positions.
 You will use this idea constantly.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>counts <span class="sc">&gt;</span> <span class="dv">500</span>                 <span class="co"># the underlying TRUE/FALSE vector</span></span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="co">#&gt; [1]  TRUE  TRUE  TRUE FALSE FALSE</span></span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>genera[counts <span class="sc">&gt;</span> <span class="dv">500</span>]         <span class="co"># which genera are abundant here?</span></span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Bacteroides&quot;      &quot;Prevotella&quot;       &quot;Faecalibacterium&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># The comparison itself produces a TRUE/FALSE vector, one entry per element:</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>counts <span class="sc">&gt;</span> <span class="dv">500</span>                 <span class="co"># TRUE where the count exceeds 500, FALSE otherwise</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="co">#&gt; [1]  TRUE  TRUE  TRUE FALSE FALSE</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="co"># Feed that mask to genera[] to keep the names at the TRUE positions:</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>genera[counts <span class="sc">&gt;</span> <span class="dv">500</span>]         <span class="co"># which genera are abundant (&gt;500) in this sample?</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Bacteroides&quot;      &quot;Prevotella&quot;       &quot;Faecalibacterium&quot;</span></span></code></pre></div>
 </div>
 <div id="missing-values-na" class="section level3">
 <h3>2.2 · Missing values (<code>NA</code>)</h3>
 <p>Real data has gaps. R marks a missing value as <code>NA</code>. Many
 functions return <code>NA</code> if any input is <code>NA</code> —
 unless you tell them to ignore it with <code>na.rm = TRUE</code>.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>ages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">34</span>, <span class="dv">51</span>, <span class="cn">NA</span>, <span class="dv">22</span>, <span class="dv">47</span>)   <span class="co"># one unknown age</span></span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">mean</span>(ages)                      <span class="co"># NA — R refuses to guess</span></span>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>ages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">34</span>, <span class="dv">51</span>, <span class="cn">NA</span>, <span class="dv">22</span>, <span class="dv">47</span>)   <span class="co"># NA marks the one participant whose age is unknown</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">mean</span>(ages)                      <span class="co"># returns NA — one missing value &quot;poisons&quot; the mean</span></span>
 <span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="co">#&gt; [1] NA</span></span>
-<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="fu">mean</span>(ages, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)        <span class="co"># ignore the NA and average the rest</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="fu">mean</span>(ages, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)        <span class="co"># na.rm = TRUE drops the NA, then averages the rest</span></span>
 <span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co">#&gt; [1] 38.5</span></span>
-<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="fu">is.na</span>(ages)                     <span class="co"># TRUE exactly where a value is missing</span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="fu">is.na</span>(ages)                     <span class="co"># TRUE exactly at the missing position, FALSE elsewhere</span></span>
 <span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co">#&gt; [1] FALSE FALSE  TRUE FALSE FALSE</span></span></code></pre></div>
 <blockquote>
 <p>📌 <strong>Teaching note.</strong> <code>NA</code> is <em>not</em>
@@ -3048,17 +3056,20 @@ gives the position of the maximum.</p>
 (e.g. BMI group), R has a special type called a <strong>factor</strong>.
 Factors remember the full set of categories (“levels”) and control their
 order — which matters for tables and plots.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>bmi <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;lean&quot;</span>, <span class="st">&quot;obese&quot;</span>, <span class="st">&quot;lean&quot;</span>, <span class="st">&quot;overweight&quot;</span>, <span class="st">&quot;obese&quot;</span>, <span class="st">&quot;lean&quot;</span>)</span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>bmi_f <span class="ot">&lt;-</span> <span class="fu">factor</span>(bmi, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;lean&quot;</span>, <span class="st">&quot;overweight&quot;</span>, <span class="st">&quot;obese&quot;</span>))</span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>bmi_f</span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt; [1] lean       obese      lean       overweight obese      lean      </span></span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt; Levels: lean overweight obese</span></span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="fu">levels</span>(bmi_f)     <span class="co"># the categories, in the order we chose</span></span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;lean&quot;       &quot;overweight&quot; &quot;obese&quot;</span></span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="fu">table</span>(bmi_f)      <span class="co"># count how many samples fall in each category</span></span>
-<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="co">#&gt; bmi_f</span></span>
-<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="co">#&gt;       lean overweight      obese </span></span>
-<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="co">#&gt;          3          1          2</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># Start with plain text categories (one BMI class per participant):</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>bmi <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;lean&quot;</span>, <span class="st">&quot;obese&quot;</span>, <span class="st">&quot;lean&quot;</span>, <span class="st">&quot;overweight&quot;</span>, <span class="st">&quot;obese&quot;</span>, <span class="st">&quot;lean&quot;</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co"># factor() converts text -&gt; a factor; &#39;levels&#39; fixes the categories AND their order</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co"># (we choose lean &lt; overweight &lt; obese, a meaningful order, not alphabetical).</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>bmi_f <span class="ot">&lt;-</span> <span class="fu">factor</span>(bmi, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;lean&quot;</span>, <span class="st">&quot;overweight&quot;</span>, <span class="st">&quot;obese&quot;</span>))</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>bmi_f</span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt; [1] lean       obese      lean       overweight obese      lean      </span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="co">#&gt; Levels: lean overweight obese</span></span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="fu">levels</span>(bmi_f)     <span class="co"># inspect the categories, printed in the order we set</span></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="co">#&gt; [1] &quot;lean&quot;       &quot;overweight&quot; &quot;obese&quot;</span></span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="fu">table</span>(bmi_f)      <span class="co"># tally how many participants fall in each category</span></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a><span class="co">#&gt; bmi_f</span></span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="co">#&gt;       lean overweight      obese </span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a><span class="co">#&gt;          3          1          2</span></span></code></pre></div>
 <p>We will lean on factors heavily when we colour and facet plots
 later.</p>
 <hr />
@@ -3070,24 +3081,26 @@ something, and returns a result. You have used built-in ones
 (<code>mean</code>, <code>sum</code>). You can write your own with
 <code>function(...) { ... }</code>. The last line is what it
 returns.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># A function that turns a vector of counts into proportions (%).</span></span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>to_percent <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  x <span class="sc">/</span> <span class="fu">sum</span>(x) <span class="sc">*</span> <span class="dv">100</span>      <span class="co"># this value is returned</span></span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>}</span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a></span>
-<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="fu">to_percent</span>(counts)      <span class="co"># call it just like a built-in function</span></span>
-<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="co">#&gt; [1] 35.862069 12.610837 45.517241  1.871921  4.137931</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># Define a function with function(args){ body }. &#39;x&#39; is the input placeholder.</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="co"># This one turns a vector of counts into percentages of the total.</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>to_percent <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  x <span class="sc">/</span> <span class="fu">sum</span>(x) <span class="sc">*</span> <span class="dv">100</span>      <span class="co"># last expression = the value the function returns</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>}</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="fu">to_percent</span>(counts)      <span class="co"># call it like any built-in; &#39;counts&#39; becomes x inside</span></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="co">#&gt; [1] 35.862069 12.610837 45.517241  1.871921  4.137931</span></span></code></pre></div>
 <p>Arguments can have <strong>defaults</strong>:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># Shannon diversity index — a real ecology metric we will use all week.</span></span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>shannon <span class="ot">&lt;-</span> <span class="cf">function</span>(counts, <span class="at">base =</span> <span class="fu">exp</span>(<span class="dv">1</span>)) {</span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>  p <span class="ot">&lt;-</span> counts[counts <span class="sc">&gt;</span> <span class="dv">0</span>] <span class="sc">/</span> <span class="fu">sum</span>(counts)  <span class="co"># proportions of present taxa</span></span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>  <span class="sc">-</span><span class="fu">sum</span>(p <span class="sc">*</span> <span class="fu">log</span>(p, <span class="at">base =</span> base))          <span class="co"># the Shannon formula</span></span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>}</span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a></span>
-<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="fu">shannon</span>(counts)          <span class="co"># uses the default (natural log)</span></span>
-<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co">#&gt; [1] 1.193401</span></span>
-<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="fu">shannon</span>(counts, <span class="at">base =</span> <span class="dv">2</span>)  <span class="co"># override the default -&gt; &quot;bits&quot;</span></span>
-<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="co">#&gt; [1] 1.721714</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># Shannon diversity — a real ecology metric we reuse all week.</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="co"># &#39;base = exp(1)&#39; is a DEFAULT: if the caller omits base, natural log is used.</span></span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>shannon <span class="ot">&lt;-</span> <span class="cf">function</span>(counts, <span class="at">base =</span> <span class="fu">exp</span>(<span class="dv">1</span>)) {</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>  p <span class="ot">&lt;-</span> counts[counts <span class="sc">&gt;</span> <span class="dv">0</span>] <span class="sc">/</span> <span class="fu">sum</span>(counts)  <span class="co"># keep present taxa, convert to proportions</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>  <span class="sc">-</span><span class="fu">sum</span>(p <span class="sc">*</span> <span class="fu">log</span>(p, <span class="at">base =</span> base))          <span class="co"># the Shannon formula: -sum(p * log p)</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>}</span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="fu">shannon</span>(counts)            <span class="co"># no &#39;base&#39; given -&gt; uses the default (natural log, &quot;nats&quot;)</span></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="co">#&gt; [1] 1.193401</span></span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="fu">shannon</span>(counts, <span class="at">base =</span> <span class="dv">2</span>)  <span class="co"># override the default -&gt; measures diversity in &quot;bits&quot;</span></span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="co">#&gt; [1] 1.721714</span></span></code></pre></div>
 <div id="exercise-3" class="section level3">
 <h3>Exercise 3</h3>
 <p>Write a function <code>richness(x)</code> that returns how many taxa
@@ -3119,12 +3132,12 @@ left-to-right, like a recipe.</p>
 <li><code>%&gt;%</code> — the <strong>magrittr</strong> pipe from the
 tidyverse. You will see it everywhere.</li>
 </ul>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># Without a pipe: nested calls, read inside-out (awkward).</span></span>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># Without a pipe: calls nest inside each other, so you read INSIDE-OUT (awkward).</span></span>
 <span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(counts), <span class="dv">1</span>)</span>
 <span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a><span class="co">#&gt; [1] 1015</span></span>
 <span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a></span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="co"># With the native pipe: read left-to-right (natural).</span></span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>counts <span class="sc">|&gt;</span> <span class="fu">mean</span>() <span class="sc">|&gt;</span> <span class="fu">round</span>(<span class="dv">1</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="co"># With the native pipe: read LEFT-TO-RIGHT. Read &#39;|&gt;&#39; as the word &quot;then&quot;.</span></span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>counts <span class="sc">|&gt;</span> <span class="fu">mean</span>() <span class="sc">|&gt;</span> <span class="fu">round</span>(<span class="dv">1</span>)   <span class="co"># take counts, THEN mean(), THEN round to 1 decimal</span></span>
 <span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a><span class="co">#&gt; [1] 1015</span></span></code></pre></div>
 <p>We use the pipe constantly in the wrangling and plotting lessons,
 because it lets us write “filter, then group, then summarise” as one

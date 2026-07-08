@@ -34,11 +34,13 @@ locates the `data/` folder whether you knit from the `notebooks/` folder or from
 the project root.
 
 ```{r message=FALSE}
-library(readr)     # fast CSV import
-library(dplyr)     # data wrangling (we use a little here, a lot in lesson 03)
-library(tibble)    # modern data frames
+# library() loads an installed package so its functions become available.
+library(readr)     # fast, friendly CSV import (read_csv)
+library(dplyr)     # data wrangling verbs (a little here, a lot in lesson 03)
+library(tibble)    # modern data frames ("tibbles")
 
-# Find the data folder from wherever this file is being run.
+# The data may sit at ../data (if knitting from notebooks/) or data/ (project root).
+# This one-liner picks whichever path actually exists, so the lesson runs either way.
 data_dir <- if (file.exists("../data/sample_metadata.csv")) "../data" else "data"
 ```
 
@@ -72,8 +74,10 @@ frame). It prints a short message telling you the **type it guessed for each
 column** — always read that message.
 
 ```{r}
+# file.path() joins folder + file with the right separator ("../data/sample_metadata.csv").
+# read_csv() reads that CSV into a tibble; watch the message reporting each column's type.
 meta <- read_csv(file.path(data_dir, "sample_metadata.csv"))
-meta
+meta                              # print the tibble: first 10 rows + dimensions + col types
 ```
 
 Notice what a tibble does for you: it prints only the first 10 rows, shows the
@@ -91,25 +95,25 @@ Before analysing anything, *look* at it. These are the commands you will run
 first on every new table.
 
 ```{r}
-dim(meta)        # rows, columns
-nrow(meta)       # number of rows (samples)
-ncol(meta)       # number of columns (variables)
-names(meta)      # the column names
+dim(meta)        # the shape as c(rows, columns) = c(samples, variables)
+nrow(meta)       # number of rows    -> here, participants/samples (1006)
+ncol(meta)       # number of columns -> here, variables measured per sample
+names(meta)      # the column names, i.e. the variable names in this table
 ```
 
 `glimpse()` is the best single overview: it lists every column, its type, and
 the first few values — transposed so wide tables still fit.
 
 ```{r}
-glimpse(meta)
+glimpse(meta)    # one row per COLUMN: name, type (<chr>/<dbl>/…), and first values
 ```
 
 `head()` / `tail()` show the first / last rows; `summary()` gives per-column
 statistics (and, crucially, counts of `NA`).
 
 ```{r}
-head(meta, 4)
-summary(meta)
+head(meta, 4)    # the first 4 rows — a quick sanity check that import worked
+summary(meta)    # per-column stats: min/median/max for numbers, counts of NA's
 ```
 
 > 📌 **Teaching note.** Point at the `summary()` output for `age`: it lists
@@ -148,17 +152,18 @@ A column is just a vector. Pull one out with `$` (or `[[ ]]`), then use anything
 you learned in lesson 01.
 
 ```{r}
-mean(meta$age, na.rm = TRUE)     # average age (ignoring missing)
-range(meta$diversity_shannon)    # min and max diversity
-length(unique(meta$nationality)) # how many distinct regions?
+# 'table$column' pulls one column out as a plain vector — then use lesson-01 tools.
+mean(meta$age, na.rm = TRUE)     # mean age; na.rm = TRUE skips participants with no age
+range(meta$diversity_shannon)    # min and max Shannon diversity across all samples
+length(unique(meta$nationality)) # unique() drops duplicates -> count of distinct regions
 ```
 
 `table()` counts the categories in a text column — your first look at group sizes.
 
 ```{r}
-table(meta$nationality)   # samples per geographic region
-table(meta$bmi_group)     # samples per BMI class
-table(meta$sex, useNA = "ifany")  # include a count of missing sex
+table(meta$nationality)          # count samples per geographic region
+table(meta$bmi_group)            # count samples per BMI class
+table(meta$sex, useNA = "ifany") # useNA = "ifany" adds a column counting missing sex
 ```
 
 ---
@@ -170,20 +175,21 @@ grouping, ordered tables and plots, we convert them to **factors** and set a
 meaningful order for BMI (lean → morbidly obese, not alphabetical).
 
 ```{r}
-# Convert with a sensible order for bmi_group.
+# Define the clinical order for BMI once, low -> high, so it isn't alphabetical.
 bmi_levels <- c("underweight", "lean", "overweight",
                 "obese", "severeobese", "morbidobese")
 
+# '|>' pipes meta into mutate(); read it as "take meta, THEN change these columns".
 meta <- meta |>
   mutate(
-    sex         = factor(sex),
-    nationality = factor(nationality),
-    bmi_group   = factor(bmi_group, levels = bmi_levels)
+    sex         = factor(sex),          # text -> factor (categories from the data)
+    nationality = factor(nationality),  # text -> factor, ditto
+    bmi_group   = factor(bmi_group, levels = bmi_levels)  # + impose our chosen order
   )
 
-# Now the levels are ordered the way a clinician would read them.
-levels(meta$bmi_group)
-table(meta$bmi_group)      # counts respect that order
+# Confirm the factor now carries our order, not R's default alphabetical one.
+levels(meta$bmi_group)     # underweight -> morbidobese, as we set
+table(meta$bmi_group)      # the counts now print in that clinical order
 ```
 
 `mutate()` (from **dplyr**) adds or changes columns — we meet it properly next
@@ -217,7 +223,8 @@ HITChip measures *genus-like groups*, so many column names carry an "et rel."
 and look at three of those groups for the first few samples.
 
 ```{r}
-dim(abund)                              # 1006 samples x 131 columns
+dim(abund)                              # 1006 samples (rows) x 131 columns (id + 130 genera)
+# table[rows, columns]: pick rows 1-5 and just four named columns to keep it readable.
 abund[1:5, c("sample_id", "Akkermansia", "Escherichia coli et rel.",
              "Bacteroides fragilis et rel.")]
 ```

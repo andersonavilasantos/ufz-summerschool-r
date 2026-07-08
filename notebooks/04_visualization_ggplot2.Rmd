@@ -37,18 +37,21 @@ per-sample metadata and the long, joined abundance table), so this lesson stands
 on its own.
 
 ```{r}
-library(readr); library(dplyr); library(tidyr)
-library(ggplot2); library(forcats)
+library(readr); library(dplyr); library(tidyr)   # import + wrangle (from lessons 02-03)
+library(ggplot2); library(forcats)                # ggplot2 = plotting; forcats = order factors
 
+# Locate and load the three tables, exactly as before.
 data_dir <- if (file.exists("../data/sample_metadata.csv")) "../data" else "data"
 meta     <- read_csv(file.path(data_dir, "sample_metadata.csv"))
 taxonomy <- read_csv(file.path(data_dir, "taxonomy.csv"))
 abund    <- read_csv(file.path(data_dir, "genus_abundance.csv"))
 
+# Re-apply the clinical BMI order so plots list groups low -> high, not alphabetically.
 bmi_levels <- c("underweight","lean","overweight","obese","severeobese","morbidobese")
 meta <- meta |> mutate(bmi_group = factor(bmi_group, levels = bmi_levels))
 
-# Long, joined table (genus in sample, with phylum + region).
+# Rebuild the long, joined table from lesson 03 (pivot -> join taxonomy -> join metadata),
+# so this lesson is self-contained: one row per genus-in-sample, with phylum + region.
 full <- abund |>
   pivot_longer(-sample_id, names_to = "genus", values_to = "abundance") |>
   left_join(taxonomy, by = "genus") |>
@@ -68,8 +71,10 @@ Every ggplot is built from layers you **add with `+`**:
 3. optional **facets**, **scales**, **labels** and a **theme**.
 
 ```{r first-plot}
-ggplot(meta, aes(x = age, y = diversity_shannon)) +  # data + mapping
-  geom_point()                                        # + a geom
+# ggplot(data, aes(...)) sets the data + the aesthetic mapping (which var -> which axis).
+# Then '+' ADDS a layer. Note: ggplot chains with '+', NOT the pipe |>.
+ggplot(meta, aes(x = age, y = diversity_shannon)) +  # map age -> x, diversity -> y
+  geom_point()                                        # draw one point per sample
 ```
 
 Read it as a sentence: *"For each sample, put `age` on x and `diversity_shannon`
@@ -85,12 +90,13 @@ on y, and draw a point."* Everything else is refinement.
 Map a third variable to **colour** and add a trend line with `geom_smooth()`.
 
 ```{r scatter-colour}
+# You can pipe data INTO ggplot(), then switch to '+' once the plot starts.
 meta |>
-  filter(!is.na(age)) |>
+  filter(!is.na(age)) |>                                # drop samples with unknown age first
   ggplot(aes(x = age, y = diversity_shannon)) +
-  geom_point(alpha = 0.4, colour = "steelblue") +      # alpha = transparency
-  geom_smooth(method = "lm", se = TRUE, colour = "darkred") +  # linear trend
-  labs(title = "Gut diversity vs. age",
+  geom_point(alpha = 0.4, colour = "steelblue") +      # alpha < 1 = semi-transparent points
+  geom_smooth(method = "lm", se = TRUE, colour = "darkred") +  # lm = straight-line fit + CI band
+  labs(title = "Gut diversity vs. age",                # labs() sets titles and axis labels
        x = "Age (years)", y = "Shannon diversity")
 ```
 
@@ -98,10 +104,11 @@ Colour by a category to compare groups in one panel:
 
 ```{r scatter-by-region}
 meta |>
-  filter(!is.na(age), nationality %in% c("Scandinavia","US","SouthEurope")) |>
+  filter(!is.na(age), nationality %in% c("Scandinavia","US","SouthEurope")) |>  # 3 regions
+  # Mapping colour = nationality INSIDE aes() colours points by category automatically.
   ggplot(aes(x = age, y = diversity_shannon, colour = nationality)) +
   geom_point(alpha = 0.6) +
-  labs(title = "Diversity vs. age by region", colour = "Region")
+  labs(title = "Diversity vs. age by region", colour = "Region")  # 'colour =' renames the legend
 ```
 
 ### Exercise 1
@@ -127,8 +134,9 @@ meta |>
 One numeric variable: how is it spread?
 
 ```{r histogram}
+# A histogram needs only ONE variable (x); ggplot bins it and counts per bin.
 ggplot(meta, aes(x = diversity_shannon)) +
-  geom_histogram(bins = 30, fill = "steelblue", colour = "white") +
+  geom_histogram(bins = 30, fill = "steelblue", colour = "white") +  # 30 bars; white bar borders
   labs(title = "Distribution of Shannon diversity",
        x = "Shannon diversity", y = "Number of samples")
 ```
@@ -138,8 +146,9 @@ Overlay densities to compare groups (fill with transparency):
 ```{r density}
 meta |>
   filter(nationality %in% c("Scandinavia","US")) |>
+  # fill = nationality draws one smoothed density curve per region, in different colours.
   ggplot(aes(x = diversity_shannon, fill = nationality)) +
-  geom_density(alpha = 0.4) +
+  geom_density(alpha = 0.4) +                          # alpha lets overlapping curves show through
   labs(title = "Diversity distribution: Scandinavia vs US", fill = "Region")
 ```
 
@@ -153,12 +162,13 @@ raw points with `geom_jitter()` for honesty about sample sizes.
 ```{r boxplot}
 meta |>
   filter(!is.na(bmi_group)) |>
+  # x = a category, y = a number: the classic "does this metric differ between groups?" plot.
   ggplot(aes(x = bmi_group, y = diversity_shannon, fill = bmi_group)) +
-  geom_boxplot(outlier.alpha = 0.3) +
-  geom_jitter(width = 0.15, alpha = 0.15, size = 0.5) +
+  geom_boxplot(outlier.alpha = 0.3) +                  # box = median + quartiles; faded outliers
+  geom_jitter(width = 0.15, alpha = 0.15, size = 0.5) +# scatter the raw points so N is visible
   labs(title = "Diversity across BMI groups",
        x = "BMI group", y = "Shannon diversity") +
-  theme(legend.position = "none")            # redundant legend -> hide it
+  theme(legend.position = "none")            # x-axis already labels the groups -> hide the legend
 ```
 
 Reorder categories by their median with `forcats::fct_reorder()` so the plot
@@ -166,12 +176,14 @@ tells the story at a glance:
 
 ```{r boxplot-ordered}
 meta |>
+  # fct_reorder(f, x, .fun) reorders the category f by a summary of x — here each
+  # region is ordered by its MEDIAN diversity, so the boxes climb in a readable order.
   ggplot(aes(x = fct_reorder(nationality, diversity_shannon, .fun = median),
              y = diversity_shannon)) +
   geom_boxplot(fill = "seagreen", alpha = 0.7) +
-  coord_flip() +                              # horizontal — easier to read labels
+  coord_flip() +                              # flip x/y -> horizontal bars, long labels fit
   labs(title = "Gut diversity by region (sorted by median)",
-       x = NULL, y = "Shannon diversity")
+       x = NULL, y = "Shannon diversity")     # x = NULL: no axis title needed (labels are clear)
 ```
 
 ### Exercise 2
@@ -198,22 +210,22 @@ meta |>
 **already computed**. Use `geom_col()` after a `summarise()`.
 
 ```{r bar-counts}
-# geom_bar: how many samples per region?
+# geom_bar COUNTS rows for you — give it only x, no y needed.
 meta |>
-  ggplot(aes(x = fct_infreq(nationality))) +   # order bars by frequency
-  geom_bar(fill = "darkorange") +
+  ggplot(aes(x = fct_infreq(nationality))) +   # fct_infreq: order bars from most to least frequent
+  geom_bar(fill = "darkorange") +              # bar height = number of samples in that region
   labs(title = "Samples per region", x = NULL, y = "Count") +
-  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))  # tilt x labels 30 deg so they don't overlap
 ```
 
 ```{r bar-summary}
-# geom_col: mean diversity per region (values computed first).
+# geom_col draws bars from values you ALREADY computed -> summarise first, then plot.
 meta |>
   group_by(nationality) |>
-  summarise(mean_shannon = mean(diversity_shannon)) |>
-  ggplot(aes(x = fct_reorder(nationality, mean_shannon), y = mean_shannon)) +
-  geom_col(fill = "steelblue") +
-  coord_flip() +
+  summarise(mean_shannon = mean(diversity_shannon)) |>  # one mean per region
+  ggplot(aes(x = fct_reorder(nationality, mean_shannon), y = mean_shannon)) +  # order bars by height
+  geom_col(fill = "steelblue") +               # bar height = the mean we computed (y)
+  coord_flip() +                               # horizontal for readable region names
   labs(title = "Mean Shannon diversity per region", x = NULL, y = "Mean diversity")
 ```
 
@@ -223,18 +235,20 @@ The classic microbiome figure: **phylum composition per region** (the table we
 built in lesson 03). We compute relative abundances, then stack them.
 
 ```{r stacked-bar, fig.height=5}
+# Same split-apply-combine as lesson 03: per-phylum sum -> per-sample proportion -> region mean.
 composition <- full |>
   group_by(sample_id, nationality, phylum) |>
-  summarise(phy_abund = sum(abundance), .groups = "drop") |>
+  summarise(phy_abund = sum(abundance), .groups = "drop") |>  # total abundance per phylum in a sample
   group_by(sample_id) |>
-  mutate(rel = phy_abund / sum(phy_abund)) |>
+  mutate(rel = phy_abund / sum(phy_abund)) |>                 # -> its share of that sample
   group_by(nationality, phylum) |>
-  summarise(mean_rel = mean(rel), .groups = "drop")
+  summarise(mean_rel = mean(rel), .groups = "drop")           # -> average share per region
 
+# fill = phylum stacks phyla within each region bar; fct_reorder orders the stack by size.
 ggplot(composition, aes(x = nationality, y = mean_rel,
                         fill = fct_reorder(phylum, mean_rel, sum))) +
-  geom_col() +                                   # stacked because fill differs
-  scale_y_continuous(labels = scales::percent) + # y axis as %
+  geom_col() +                                   # bars stack automatically when 'fill' varies
+  scale_y_continuous(labels = scales::percent) + # format the y axis as percentages
   labs(title = "Phylum composition across regions",
        x = NULL, y = "Mean relative abundance", fill = "Phylum") +
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
@@ -255,8 +269,8 @@ meta |>
   filter(!is.na(age), nationality %in% c("Scandinavia","US","SouthEurope","UKIE")) |>
   ggplot(aes(age, diversity_shannon)) +
   geom_point(alpha = 0.4, colour = "steelblue") +
-  geom_smooth(method = "lm", se = FALSE, colour = "darkred") +
-  facet_wrap(~ nationality) +                    # one panel per region
+  geom_smooth(method = "lm", se = FALSE, colour = "darkred") +  # se = FALSE: line only, no band
+  facet_wrap(~ nationality) +                    # ~var splits the plot into one panel per region
   labs(title = "Diversity vs age, by region")
 ```
 
@@ -270,21 +284,22 @@ meta |>
 - **Themes** (`theme_minimal`, `theme_bw`, …) set the overall look.
 
 ```{r polish, fig.height=5}
+# Store the plot in an object 'p' so we can print it AND save it later (§8).
 p <- composition |>
   filter(phylum %in% c("Firmicutes", "Bacteroidetes", "Proteobacteria",
-                       "Actinobacteria")) |>
+                       "Actinobacteria")) |>                # focus on the four major phyla
   ggplot(aes(x = nationality, y = mean_rel, fill = phylum)) +
-  geom_col(position = "dodge") +                          # side-by-side bars
-  scale_y_continuous(labels = scales::percent) +
-  scale_fill_brewer(palette = "Set2") +                   # a colour-blind-friendly palette
+  geom_col(position = "dodge") +                          # "dodge" = side-by-side, not stacked
+  scale_y_continuous(labels = scales::percent) +          # y axis as %
+  scale_fill_brewer(palette = "Set2") +                   # a colour-blind-friendly fill palette
   labs(title = "Four major phyla across regions",
        subtitle = "Human gut microbiome — HITChip Atlas",
        x = NULL, y = "Mean relative abundance", fill = "Phylum",
        caption = "Data: Lahti et al. 2014, Nat. Commun.") +
-  theme_minimal(base_size = 12) +
+  theme_minimal(base_size = 12) +                         # a clean theme; base_size scales all text
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
-p
+p                                                         # printing the object draws the plot
 ```
 
 ---
@@ -295,11 +310,12 @@ p
 print. Size and resolution are up to you.
 
 ```{r save, eval=TRUE}
-dir.create("../figures", showWarnings = FALSE)   # ensure the folder exists
+dir.create("../figures", showWarnings = FALSE)   # make the folder; stay quiet if it already exists
+# Choose an output path that works whether or not ../figures exists.
 out <- ifelse(dir.exists("../figures"),
               "../figures/phylum_composition.png", "phylum_composition.png")
-ggsave(out, plot = p, width = 8, height = 5, dpi = 150)
-cat("Saved figure to", normalizePath(out), "\n")
+ggsave(out, plot = p, width = 8, height = 5, dpi = 150)  # write plot 'p' to disk (inches, dpi)
+cat("Saved figure to", normalizePath(out), "\n")         # print the full path we wrote to
 ```
 
 ### Exercise 3

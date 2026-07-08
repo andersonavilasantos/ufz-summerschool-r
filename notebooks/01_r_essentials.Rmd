@@ -66,22 +66,24 @@ We store values in **objects** using the assignment arrow `<-`
 
 ```{r}
 # Store the number of samples in our dataset in an object called n_samples.
-n_samples <- 1006          # '<-' means: put 1006 into n_samples
+n_samples <- 1006          # '<-' is R's assignment arrow: put 1006 INTO n_samples
+                           # (in R we use '<-', not '='; think of it as "gets")
 
-n_samples                  # typing the name prints the value
+n_samples                  # type an object's name on its own line -> R prints it
 
-# You can compute with objects just like with raw numbers.
-n_taxa <- 130
-n_samples * n_taxa         # total cells in the abundance table
+# Objects behave exactly like the values inside them, so we can compute with them.
+n_taxa <- 130              # 130 bacterial genera measured in our study
+n_samples * n_taxa         # samples x genera = total cells in the abundance table
 ```
 
 R has a few basic **types** of value. The function `class()` tells you which:
 
 ```{r}
-class(3.14)                # "numeric"  — numbers (with decimals)
-class(42L)                 # "integer"  — the L makes it a whole number
-class("Firmicutes")        # "character"— text, always in quotes
-class(TRUE)                # "logical"  — TRUE / FALSE
+# class() reveals the TYPE of a value — getting types wrong is a top beginner bug.
+class(3.14)                # "numeric"  -> numbers (decimals); R's default number type
+class(42L)                 # "integer"  -> a whole number; the trailing L forces integer
+class("Firmicutes")        # "character"-> text; ALWAYS wrapped in quotes, e.g. a taxon name
+class(TRUE)                # "logical"  -> TRUE / FALSE, the result of a yes/no test
 ```
 
 > 📌 **Teaching note.** Beginners mix up `=` and `<-`. Both can assign, but the
@@ -111,13 +113,14 @@ A **vector** is an ordered collection of values *of the same type*. You build on
 with `c()` ("combine"). Almost everything in R is a vector.
 
 ```{r}
-# Five bacterial genera (a character vector).
+# c() = "combine": glue values into a vector. All elements share ONE type.
+# Here: five common human-gut genera as a character (text) vector.
 genera <- c("Bacteroides", "Prevotella", "Faecalibacterium",
             "Escherichia", "Akkermansia")
-genera
+genera                    # print it: R shows the 5 elements in order
 
-# Their (made-up) abundances in one sample (a numeric vector).
-counts <- c(1820, 640, 2310, 95, 210)
+# Their (made-up) abundances in one sample — a numeric vector, aligned to 'genera'.
+counts <- c(1820, 640, 2310, 95, 210)   # element i is the count of genus i
 counts
 ```
 
@@ -125,19 +128,21 @@ The magic of R: operations apply to **every element at once** (this is called
 *vectorisation*) — no loops needed.
 
 ```{r}
-counts * 2          # double every value
-counts / sum(counts)  # convert to proportions (each value / the total)
-log(counts)         # natural log of each value
+# Vectorisation: the operation is applied to EVERY element at once, no loop needed.
+counts * 2            # multiply each count by 2 -> a new 5-element vector
+counts / sum(counts)  # each count / the total = its proportion of the community
+log(counts)           # natural log of each value (common for skewed abundance data)
 ```
 
 Handy summary functions work on the whole vector:
 
 ```{r}
-length(counts)   # how many elements?
-sum(counts)      # total
-mean(counts)     # average
-max(counts)      # largest
-min(counts)      # smallest
+# These reductions take the whole vector and return a single summary number.
+length(counts)   # how many elements (here: how many genera)?
+sum(counts)      # total read count across all genera
+mean(counts)     # average count per genus
+max(counts)      # the largest count (the most abundant genus)
+min(counts)      # the smallest count (the rarest genus)
 ```
 
 ### 2.1 · Indexing (picking elements)
@@ -145,17 +150,20 @@ min(counts)      # smallest
 R counts **from 1** (not 0). Use square brackets `[ ]` to pick elements.
 
 ```{r}
-genera[1]            # the first genus
-genera[c(1, 3)]      # the first and third
-counts[counts > 500] # keep only counts above 500 (a logical filter!)
+# Square brackets pick elements by position. R starts counting at 1 (not 0!).
+genera[1]            # the 1st genus ("Bacteroides")
+genera[c(1, 3)]      # pass a vector of positions -> the 1st and 3rd genera
+counts[counts > 500] # logical filter: keep only the counts greater than 500
 ```
 
 That last line is powerful: `counts > 500` produces `TRUE/FALSE`, and R keeps the
 `TRUE` positions. You will use this idea constantly.
 
 ```{r}
-counts > 500                 # the underlying TRUE/FALSE vector
-genera[counts > 500]         # which genera are abundant here?
+# The comparison itself produces a TRUE/FALSE vector, one entry per element:
+counts > 500                 # TRUE where the count exceeds 500, FALSE otherwise
+# Feed that mask to genera[] to keep the names at the TRUE positions:
+genera[counts > 500]         # which genera are abundant (>500) in this sample?
 ```
 
 ### 2.2 · Missing values (`NA`)
@@ -164,10 +172,10 @@ Real data has gaps. R marks a missing value as `NA`. Many functions return `NA`
 if any input is `NA` — unless you tell them to ignore it with `na.rm = TRUE`.
 
 ```{r}
-ages <- c(34, 51, NA, 22, 47)   # one unknown age
-mean(ages)                      # NA — R refuses to guess
-mean(ages, na.rm = TRUE)        # ignore the NA and average the rest
-is.na(ages)                     # TRUE exactly where a value is missing
+ages <- c(34, 51, NA, 22, 47)   # NA marks the one participant whose age is unknown
+mean(ages)                      # returns NA — one missing value "poisons" the mean
+mean(ages, na.rm = TRUE)        # na.rm = TRUE drops the NA, then averages the rest
+is.na(ages)                     # TRUE exactly at the missing position, FALSE elsewhere
 ```
 
 > 📌 **Teaching note.** `NA` is *not* zero and *not* the text "NA". It is a
@@ -196,11 +204,14 @@ special type called a **factor**. Factors remember the full set of categories
 ("levels") and control their order — which matters for tables and plots.
 
 ```{r}
+# Start with plain text categories (one BMI class per participant):
 bmi <- c("lean", "obese", "lean", "overweight", "obese", "lean")
+# factor() converts text -> a factor; 'levels' fixes the categories AND their order
+# (we choose lean < overweight < obese, a meaningful order, not alphabetical).
 bmi_f <- factor(bmi, levels = c("lean", "overweight", "obese"))
 bmi_f
-levels(bmi_f)     # the categories, in the order we chose
-table(bmi_f)      # count how many samples fall in each category
+levels(bmi_f)     # inspect the categories, printed in the order we set
+table(bmi_f)      # tally how many participants fall in each category
 ```
 
 We will lean on factors heavily when we colour and facet plots later.
@@ -214,25 +225,27 @@ You have used built-in ones (`mean`, `sum`). You can write your own with
 `function(...) { ... }`. The last line is what it returns.
 
 ```{r}
-# A function that turns a vector of counts into proportions (%).
+# Define a function with function(args){ body }. 'x' is the input placeholder.
+# This one turns a vector of counts into percentages of the total.
 to_percent <- function(x) {
-  x / sum(x) * 100      # this value is returned
+  x / sum(x) * 100      # last expression = the value the function returns
 }
 
-to_percent(counts)      # call it just like a built-in function
+to_percent(counts)      # call it like any built-in; 'counts' becomes x inside
 ```
 
 Arguments can have **defaults**:
 
 ```{r}
-# Shannon diversity index — a real ecology metric we will use all week.
+# Shannon diversity — a real ecology metric we reuse all week.
+# 'base = exp(1)' is a DEFAULT: if the caller omits base, natural log is used.
 shannon <- function(counts, base = exp(1)) {
-  p <- counts[counts > 0] / sum(counts)  # proportions of present taxa
-  -sum(p * log(p, base = base))          # the Shannon formula
+  p <- counts[counts > 0] / sum(counts)  # keep present taxa, convert to proportions
+  -sum(p * log(p, base = base))          # the Shannon formula: -sum(p * log p)
 }
 
-shannon(counts)          # uses the default (natural log)
-shannon(counts, base = 2)  # override the default -> "bits"
+shannon(counts)            # no 'base' given -> uses the default (natural log, "nats")
+shannon(counts, base = 2)  # override the default -> measures diversity in "bits"
 ```
 
 ### Exercise 3
@@ -263,11 +276,11 @@ R has two pipes that behave the same for our purposes:
 - `%>%` — the **magrittr** pipe from the tidyverse. You will see it everywhere.
 
 ```{r}
-# Without a pipe: nested calls, read inside-out (awkward).
+# Without a pipe: calls nest inside each other, so you read INSIDE-OUT (awkward).
 round(mean(counts), 1)
 
-# With the native pipe: read left-to-right (natural).
-counts |> mean() |> round(1)
+# With the native pipe: read LEFT-TO-RIGHT. Read '|>' as the word "then".
+counts |> mean() |> round(1)   # take counts, THEN mean(), THEN round to 1 decimal
 ```
 
 We use the pipe constantly in the wrangling and plotting lessons, because it

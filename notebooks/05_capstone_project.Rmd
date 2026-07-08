@@ -44,15 +44,17 @@ run them in order.
 ## Step 0 · Setup — load packages and data (just run it)
 
 ```{r}
-library(readr); library(dplyr); library(tidyr)
-library(ggplot2); library(forcats); library(stringr)
-library(vegan)     # community ecology: diversity + ordination
+library(readr); library(dplyr); library(tidyr)          # import + wrangle
+library(ggplot2); library(forcats); library(stringr)    # plot + factors + text
+library(vegan)     # community ecology toolkit: diversity() and ordination (metaMDS)
 
+# Locate and load the three tables (same pattern used in every lesson).
 data_dir <- if (file.exists("../data/sample_metadata.csv")) "../data" else "data"
 meta     <- read_csv(file.path(data_dir, "sample_metadata.csv"))
 taxonomy <- read_csv(file.path(data_dir, "taxonomy.csv"))
 abund    <- read_csv(file.path(data_dir, "genus_abundance.csv"))
 
+# cat() prints a quick shape report so we can confirm the loads worked.
 cat("metadata :", nrow(meta), "x", ncol(meta), "\n")
 cat("taxonomy :", nrow(taxonomy), "x", ncol(taxonomy), "\n")
 cat("abundance:", nrow(abund), "x", ncol(abund), "\n")
@@ -77,15 +79,16 @@ keeps only rows with a known `age` **and** known `bmi_group`, and set
 <details><summary><b>Solution: Step 1</b></summary>
 
 ```{r}
+# is.na() flags missing values; sum() counts the TRUEs -> how many gaps in each column.
 cat("missing age:", sum(is.na(meta$age)),
     " | missing sex:", sum(is.na(meta$sex)), "\n")
 
 bmi_levels <- c("underweight","lean","overweight","obese","severeobese","morbidobese")
 meta_clean <- meta |>
-  filter(!is.na(age), !is.na(bmi_group)) |>
-  mutate(bmi_group = factor(bmi_group, levels = bmi_levels))
+  filter(!is.na(age), !is.na(bmi_group)) |>              # keep only fully-labelled samples
+  mutate(bmi_group = factor(bmi_group, levels = bmi_levels))  # + set the clinical order
 
-cat("kept", nrow(meta_clean), "of", nrow(meta), "samples\n")
+cat("kept", nrow(meta_clean), "of", nrow(meta), "samples\n")  # show the cost of missing data
 ```
 </details>
 
@@ -115,8 +118,10 @@ rows and confirm it equals samples × genera.
 <details><summary><b>Solution: Step 2</b></summary>
 
 ```{r}
+# pivot_longer stacks the 130 genus columns into two: 'genus' (name) + 'abundance' (value).
 ab_long <- abund |>
   pivot_longer(-sample_id, names_to = "genus", values_to = "abundance")
+# Sanity check: rows should equal samples x genera (ncol - 1 drops the sample_id column).
 cat(nrow(ab_long), "rows =", nrow(abund), "samples x", ncol(abund) - 1, "genera\n")
 ```
 </details>
@@ -146,9 +151,10 @@ Because `meta_clean` dropped some samples, keep only rows that have metadata
 
 ```{r}
 ab_full <- ab_long |>
-  left_join(taxonomy, by = "genus") |>
+  left_join(taxonomy, by = "genus") |>                    # add phylum/family per genus
+  # inner_join keeps ONLY rows that match on both sides -> drops samples cleaned away.
   inner_join(select(meta_clean, sample_id, nationality, bmi_group, age),
-             by = "sample_id")     # inner_join keeps only samples with metadata
+             by = "sample_id")
 glimpse(ab_full)
 ```
 </details>
@@ -180,19 +186,21 @@ per-sample abundance vector), or compute by hand.
 <details><summary><b>Solution: Step 4</b></summary>
 
 ```{r}
+# Group by sample (carrying its metadata) so summarise() gives ONE diversity row per sample.
 alpha <- ab_full |>
   group_by(sample_id, nationality, bmi_group, age) |>
   summarise(
-    richness = sum(abundance > 0),
-    shannon  = diversity(abundance, index = "shannon"),  # vegan
+    richness = sum(abundance > 0),                       # count genera present (abundance > 0)
+    shannon  = diversity(abundance, index = "shannon"),  # vegan's Shannon index on the vector
     .groups  = "drop")
 
+# Then average each metric per region to compare communities.
 alpha |>
   group_by(nationality) |>
   summarise(mean_richness = mean(richness),
             mean_shannon  = mean(shannon),
-            n = n()) |>
-  arrange(desc(mean_shannon))
+            n = n()) |>                                  # n() = samples per region
+  arrange(desc(mean_shannon))                            # most diverse region first
 ```
 </details>
 
@@ -223,12 +231,12 @@ faint jittered points.
 <details><summary><b>Solution: Step 5</b></summary>
 
 ```{r}
-ggplot(alpha, aes(bmi_group, shannon, fill = bmi_group)) +
-  geom_boxplot(outlier.alpha = 0.3) +
-  geom_jitter(width = 0.15, alpha = 0.1, size = 0.4) +
+ggplot(alpha, aes(bmi_group, shannon, fill = bmi_group)) +  # category (x) vs number (y)
+  geom_boxplot(outlier.alpha = 0.3) +                       # median + quartiles per BMI group
+  geom_jitter(width = 0.15, alpha = 0.1, size = 0.4) +      # faint raw points show sample sizes
   labs(title = "Gut diversity across BMI groups",
        x = "BMI group", y = "Shannon diversity") +
-  theme_minimal() + theme(legend.position = "none")
+  theme_minimal() + theme(legend.position = "none")         # x already labels groups -> no legend
 ```
 </details>
 
@@ -250,23 +258,24 @@ region; `geom_col()`, `scale_y_continuous(labels = scales::percent)`.
 <details><summary><b>Solution: Step 6</b></summary>
 
 ```{r fig.height=5}
+# Three-stage split-apply-combine: per-phylum sum -> per-sample share -> region mean.
 composition <- ab_full |>
   group_by(sample_id, nationality, phylum) |>
-  summarise(phy = sum(abundance), .groups = "drop") |>
+  summarise(phy = sum(abundance), .groups = "drop") |>  # total abundance per phylum in a sample
   group_by(sample_id) |>
-  mutate(rel = phy / sum(phy)) |>
+  mutate(rel = phy / sum(phy)) |>                       # divide by sample total -> proportion
   group_by(nationality, phylum) |>
-  summarise(mean_rel = mean(rel), .groups = "drop")
+  summarise(mean_rel = mean(rel), .groups = "drop")     # average that share per region
 
 ggplot(composition, aes(nationality, mean_rel,
-                        fill = fct_reorder(phylum, mean_rel, sum))) +
-  geom_col() +
-  scale_y_continuous(labels = scales::percent) +
+                        fill = fct_reorder(phylum, mean_rel, sum))) +  # order the stack by size
+  geom_col() +                                          # stacks automatically (fill varies)
+  scale_y_continuous(labels = scales::percent) +        # y axis as %
   labs(title = "Phylum composition across regions",
        x = NULL, y = "Mean relative abundance", fill = "Phylum") +
-  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))  # tilt long region labels
 
-# Dominant phylum per region:
+# slice_max keeps the single top-ranked phylum within each region group:
 composition |> group_by(nationality) |> slice_max(mean_rel, n = 1)
 ```
 </details>
@@ -325,32 +334,36 @@ plot the two ordination axes coloured by region.
 <details><summary><b>Solution: Step 8</b></summary>
 
 ```{r nmds, results='hide', fig.height=5}
-# Build a sample x genus matrix (use a manageable subset for speed in class).
+# set.seed() fixes the random draw so everyone in class gets the SAME subset/ordination.
 set.seed(1)
+# Take a balanced subset: 40 random samples from each of four regions (fast enough live).
 sub_ids <- meta_clean |>
   filter(nationality %in% c("Scandinavia","US","SouthEurope","CentralEurope")) |>
-  group_by(nationality) |> slice_sample(n = 40) |> pull(sample_id)
+  group_by(nationality) |> slice_sample(n = 40) |> pull(sample_id)  # pull() -> a plain vector
 
+# vegan wants a numeric matrix with samples as rows and genera as columns.
 mat <- abund |>
   filter(sample_id %in% sub_ids) |>
-  tibble::column_to_rownames("sample_id") |>
+  tibble::column_to_rownames("sample_id") |>  # move sample_id from a column to row names
   as.matrix()
-mat <- mat[rowSums(mat) > 0, ]              # drop any empty samples
+mat <- mat[rowSums(mat) > 0, ]              # keep only rows (samples) with any reads
 
+# metaMDS: NMDS on Bray-Curtis distances; try = 20 restarts to find a stable solution.
 nmds <- metaMDS(mat, distance = "bray", trace = FALSE, try = 20)
 ```
 
 ```{r nmds-plot, fig.height=5}
+# scores(..., "sites") = the 2-D coordinates of each sample; turn them into a data frame.
 scores_df <- as.data.frame(scores(nmds, display = "sites"))
-scores_df$sample_id <- rownames(scores_df)
-scores_df <- left_join(scores_df,
+scores_df$sample_id <- rownames(scores_df)  # recover sample_id from the row names
+scores_df <- left_join(scores_df,           # attach each sample's region for colouring
                        select(meta_clean, sample_id, nationality), by = "sample_id")
 
-ggplot(scores_df, aes(NMDS1, NMDS2, colour = nationality)) +
+ggplot(scores_df, aes(NMDS1, NMDS2, colour = nationality)) +  # the two ordination axes
   geom_point(size = 2, alpha = 0.8) +
-  stat_ellipse(level = 0.7) +               # a 70% confidence ellipse per region
+  stat_ellipse(level = 0.7) +               # a 70% confidence ellipse summarising each region
   labs(title = paste0("NMDS of gut communities (stress = ",
-                      round(nmds$stress, 3), ")"),
+                      round(nmds$stress, 3), ")"),  # stress in the title (lower = better 2-D fit)
        colour = "Region") +
   theme_minimal()
 ```
@@ -373,8 +386,9 @@ ggplot(scores_df, aes(NMDS1, NMDS2, colour = nationality)) +
 <details><summary><b>Solution: Step 9</b></summary>
 
 ```{r}
-write_csv(alpha,       "capstone_alpha_diversity.csv")
-write_csv(composition, "capstone_phylum_by_region.csv")
+# write_csv() is the inverse of read_csv(): save a tibble back to a shareable CSV file.
+write_csv(alpha,       "capstone_alpha_diversity.csv")   # per-sample diversity metrics
+write_csv(composition, "capstone_phylum_by_region.csv")  # phylum composition per region
 cat("Wrote capstone_alpha_diversity.csv and capstone_phylum_by_region.csv\n")
 ```
 </details>
