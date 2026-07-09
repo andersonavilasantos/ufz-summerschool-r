@@ -1,28 +1,25 @@
-# --- R session / project artifacts ---
-.Rproj.user/
+# Jupyter / R
+.ipynb_checkpoints/
 .Rhistory
 .RData
 .Ruserdata
-*.Rproj.bak
 
-# --- knitr / rmarkdown render output ---
-*_cache/
-*_files/
-notebooks/*_cache/
-notebooks/*_files/
+# Google Colab clone target (created by the setup cell)
+course_repo/
 
-# Rendered HTML from the lessons IS committed so participants can read the
-# lessons offline in a browser without knitting (self-contained files).
-
-# --- files produced by RUNNING the lessons / capstone ---
+# Files produced by RUNNING the lessons (figures, capstone outputs)
 notebooks/*.csv
+notebooks/Rplots.pdf
 figures/*.png
 figures/*.pdf
 
-# --- OS junk ---
+# OS junk
 .DS_Store
 Thumbs.db
 desktop.ini
 
 # NOTE: the data/ CSVs ARE committed on purpose — the HITChip Atlas dataset is
 # released under CC0, which permits redistribution. See data/SOURCE.md.
+
+# RStudio user cache (leftover)
+.Rproj.user/
