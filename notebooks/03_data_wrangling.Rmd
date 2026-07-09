@@ -21,7 +21,7 @@ knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, comment = "#>")
 
 This is the **core** of the session — the toolkit you will reuse all week.
 
-- Reshape the six **dplyr verbs**: `filter`, `select`, `mutate`, `arrange`,
+- Master the six core **dplyr verbs**: `filter`, `select`, `mutate`, `arrange`,
   `summarise`, and `group_by`.
 - Combine tables with **joins** (`left_join`).
 - Move between **wide** and **long** shapes with `pivot_longer` / `pivot_wider`.

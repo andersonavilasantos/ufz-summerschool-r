@@ -3139,6 +3139,14 @@ tidyverse. You will see it everywhere.</li>
 <span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="co"># With the native pipe: read LEFT-TO-RIGHT. Read &#39;|&gt;&#39; as the word &quot;then&quot;.</span></span>
 <span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>counts <span class="sc">|&gt;</span> <span class="fu">mean</span>() <span class="sc">|&gt;</span> <span class="fu">round</span>(<span class="dv">1</span>)   <span class="co"># take counts, THEN mean(), THEN round to 1 decimal</span></span>
 <span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a><span class="co">#&gt; [1] 1015</span></span></code></pre></div>
+<p>The tidyverse’s <code>%&gt;%</code> pipe (from
+<strong>magrittr</strong>) does the same thing. You will see it in
+countless tutorials and older code, so it helps to recognise it — the
+two are interchangeable for everything we do this session.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)                 <span class="co"># the %&gt;% pipe comes with the tidyverse (loaded via dplyr)</span></span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="co">#&gt; Warning: pacote &#39;dplyr&#39; foi compilado no R versão 4.4.3</span></span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>counts <span class="sc">%&gt;%</span> <span class="fu">mean</span>() <span class="sc">%&gt;%</span> <span class="fu">round</span>(<span class="dv">1</span>) <span class="co"># identical result to the |&gt; version above</span></span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a><span class="co">#&gt; [1] 1015</span></span></code></pre></div>
 <p>We use the pipe constantly in the wrangling and plotting lessons,
 because it lets us write “filter, then group, then summarise” as one
 readable flow.</p>
@@ -3157,8 +3165,8 @@ all in one chain.</p>
 <summary>
 <b>Solution</b> (click to expand)
 </summary>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>counts <span class="sc">|&gt;</span> <span class="fu">to_percent</span>() <span class="sc">|&gt;</span> <span class="fu">round</span>(<span class="dv">1</span>)</span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="co">#&gt; [1] 35.9 12.6 45.5  1.9  4.1</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>counts <span class="sc">|&gt;</span> <span class="fu">to_percent</span>() <span class="sc">|&gt;</span> <span class="fu">round</span>(<span class="dv">1</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a><span class="co">#&gt; [1] 35.9 12.6 45.5  1.9  4.1</span></span></code></pre></div>
 </details>
 <hr />
 </div>

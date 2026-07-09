@@ -283,6 +283,15 @@ round(mean(counts), 1)
 counts |> mean() |> round(1)   # take counts, THEN mean(), THEN round to 1 decimal
 ```
 
+The tidyverse's `%>%` pipe (from **magrittr**) does the same thing. You will see
+it in countless tutorials and older code, so it helps to recognise it — the two
+are interchangeable for everything we do this session.
+
+```{r message=FALSE}
+library(dplyr)                 # the %>% pipe comes with the tidyverse (loaded via dplyr)
+counts %>% mean() %>% round(1) # identical result to the |> version above
+```
+
 We use the pipe constantly in the wrangling and plotting lessons, because it
 lets us write "filter, then group, then summarise" as one readable flow.
 
