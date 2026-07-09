@@ -48,16 +48,17 @@ The study ships as three tidy tables: participant **metadata**, a **taxonomy**
 genera).
 
 ```{r import}
-library(readr); library(dplyr); library(tidyr)
-library(ggplot2); library(forcats); library(stringr)
+library(readr); library(dplyr); library(tidyr)      # import, wrangle, reshape
+library(ggplot2); library(forcats); library(stringr)  # plot, reorder factors, string helpers
 library(vegan)     # community ecology: diversity + ordination
 
 # Works whether you knit from notebooks/ or run from the project root.
 data_dir <- if (file.exists("../data/sample_metadata.csv")) "../data" else "data"
-meta     <- read_csv(file.path(data_dir, "sample_metadata.csv"))
-taxonomy <- read_csv(file.path(data_dir, "taxonomy.csv"))
-abund    <- read_csv(file.path(data_dir, "genus_abundance.csv"))
+meta     <- read_csv(file.path(data_dir, "sample_metadata.csv"))  # one row per participant
+taxonomy <- read_csv(file.path(data_dir, "taxonomy.csv"))         # genus -> phylum / family
+abund    <- read_csv(file.path(data_dir, "genus_abundance.csv"))  # WIDE: sample_id + one col per genus
 
+# cat() prints the dimensions so we can sanity-check each table loaded correctly.
 cat("metadata :", nrow(meta),  "x", ncol(meta),  "\n")
 cat("taxonomy :", nrow(taxonomy), "x", ncol(taxonomy), "\n")
 cat("abundance:", nrow(abund), "x", ncol(abund), "\n")
@@ -66,7 +67,7 @@ cat("abundance:", nrow(abund), "x", ncol(abund), "\n")
 A quick look at what we are working with:
 
 ```{r glimpse}
-glimpse(meta)
+glimpse(meta)   # glimpse() = a transposed preview: every column, its type, and the first values
 ```
 
 ---
@@ -84,11 +85,14 @@ cat("missing age     :", sum(is.na(meta$age)),       "\n")
 cat("missing bmi_group:", sum(is.na(meta$bmi_group)), "\n")
 cat("missing sex     :", sum(is.na(meta$sex)),        "\n")
 
+# The natural order of BMI categories (a plain vector we hand to factor() below).
 bmi_levels <- c("underweight","lean","overweight",
                 "obese","severeobese","morbidobese")
 
 meta_clean <- meta |>
-  filter(!is.na(age), !is.na(bmi_group)) |>
+  filter(!is.na(age), !is.na(bmi_group)) |>                    # keep only fully-labelled samples
+  # factor(..., levels=) makes bmi_group ORDERED: plots/tables follow underweight -> morbidobese,
+  # not alphabetical order (a classic R gotcha — character columns sort A-Z by default).
   mutate(bmi_group = factor(bmi_group, levels = bmi_levels))
 
 cat("kept", nrow(meta_clean), "of", nrow(meta), "samples after cleaning\n")
@@ -131,20 +135,21 @@ we compute **observed richness** (how many genera are present) and the **Shannon
 index** (richness weighted by evenness), then look at the mean per region.
 
 ```{r alpha}
+# One row per sample. group_by keeps the metadata columns alongside each sample.
 alpha <- ab_full |>
   group_by(sample_id, nationality, bmi_group, age) |>
   summarise(
-    richness = sum(abundance > 0),                       # genera present
-    shannon  = diversity(abundance, index = "shannon"),  # vegan::diversity
-    .groups  = "drop")
+    richness = sum(abundance > 0),                       # count of genera with count > 0 (TRUE sums as 1)
+    shannon  = diversity(abundance, index = "shannon"),  # vegan::diversity() = Shannon index
+    .groups  = "drop")                                   # drop grouping so `alpha` is a flat table
 
-# Mean diversity per region, most-diverse first.
+# Now summarise those per-sample numbers up to a mean per region, most-diverse first.
 alpha |>
   group_by(nationality) |>
   summarise(mean_richness = round(mean(richness), 1),
             mean_shannon  = round(mean(shannon), 2),
-            n = n()) |>
-  arrange(desc(mean_shannon))
+            n = n()) |>                        # n() = how many samples in each region
+  arrange(desc(mean_shannon))                  # sort highest diversity first
 ```
 
 ---
@@ -179,11 +184,11 @@ the community, average those shares within each region, and draw a **stacked bar
 ```{r fig-composition, fig.height=5}
 composition <- ab_full |>
   group_by(sample_id, nationality, phylum) |>
-  summarise(phy = sum(abundance), .groups = "drop") |>
+  summarise(phy = sum(abundance), .groups = "drop") |>  # total reads per phylum in each sample
   group_by(sample_id) |>
-  mutate(rel = phy / sum(phy)) |>                     # within-sample proportion
+  mutate(rel = phy / sum(phy)) |>                     # within-sample proportion (normalises depth)
   group_by(nationality, phylum) |>
-  summarise(mean_rel = mean(rel), .groups = "drop")   # average per region
+  summarise(mean_rel = mean(rel), .groups = "drop")   # average that proportion across each region
 
 p_comp <- ggplot(composition,
                  aes(nationality, mean_rel,
@@ -212,14 +217,30 @@ Eyeballing a boxplot is not a statistic. A **one-way ANOVA** asks whether mean
 Shannon diversity differs across BMI groups more than we would expect by chance.
 
 ```{r anova}
+# aov() fits the model "shannon explained by bmi_group"; the ~ reads as "modelled by".
 fit <- aov(shannon ~ bmi_group, data = alpha)
-summary(fit)
+summary(fit)   # the ANOVA table: look at the F value and its Pr(>F) p-value
 ```
 
 Read the **`Pr(>F)`** column: a small p-value (say < 0.05) is evidence that at
 least one BMI group differs in mean diversity. Always report the statistic
 **together** with the Step 5 boxplot — the picture shows the effect size, the test
 shows whether it is distinguishable from noise.
+
+**A second angle — *which* groups differ?** ANOVA only says "at least one group
+differs". **Tukey's HSD** does the follow-up pairwise comparisons on the *same*
+fitted model, with the p-values adjusted for multiple testing.
+
+```{r tukey}
+# TukeyHSD() takes the fitted aov object and compares every pair of BMI groups.
+tuk <- TukeyHSD(fit)
+
+# Keep the comparisons and show the most significant ones (smallest adjusted p first).
+as.data.frame(tuk$bmi_group) |>
+  tibble::rownames_to_column("comparison") |>   # the "groupA-groupB" labels become a column
+  arrange(`p adj`) |>                            # `p adj` = p-value adjusted for many comparisons
+  head(5)
+```
 
 ---
 

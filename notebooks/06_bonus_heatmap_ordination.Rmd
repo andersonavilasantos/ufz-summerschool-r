@@ -36,17 +36,19 @@ All CRAN-only. Nothing here is new machinery — just new combinations.
 ## 0 · Setup
 
 ```{r}
-library(readr); library(dplyr); library(tidyr)
-library(ggplot2); library(forcats); library(tibble)
+library(readr); library(dplyr); library(tidyr)   # import, wrangle, reshape
+library(ggplot2); library(forcats); library(tibble)  # plot, reorder factors, rownames helpers
 
+# Works whether you knit from notebooks/ or from the project root.
 data_dir <- if (file.exists("../data/sample_metadata.csv")) "../data" else "data"
-meta     <- read_csv(file.path(data_dir, "sample_metadata.csv"))
-taxonomy <- read_csv(file.path(data_dir, "taxonomy.csv"))
-abund    <- read_csv(file.path(data_dir, "genus_abundance.csv"))
+meta     <- read_csv(file.path(data_dir, "sample_metadata.csv"))  # one row per sample (participant)
+taxonomy <- read_csv(file.path(data_dir, "taxonomy.csv"))         # genus -> family / phylum lookup
+abund    <- read_csv(file.path(data_dir, "genus_abundance.csv"))  # WIDE: one column per genus
 
+# Reshape wide -> long (tidyverse verbs want long data), then attach each genus's phylum.
 ab_long <- abund |>
-  pivot_longer(-sample_id, names_to = "genus", values_to = "abundance") |>
-  left_join(taxonomy, by = "genus")
+  pivot_longer(-sample_id, names_to = "genus", values_to = "abundance") |>  # every column except sample_id becomes rows
+  left_join(taxonomy, by = "genus")   # + phylum / family columns (left_join keeps all abundance rows)
 ```
 
 ---
@@ -57,28 +59,55 @@ ab_long <- abund |>
 abundance per region, and draw a tile grid — colour = abundance.
 
 ```{r heatmap, fig.height=6}
-# Top 20 genera by total abundance across the study.
+# Step 1: find the 20 genera with the highest TOTAL abundance across the whole study.
 top_genera <- ab_long |>
-  group_by(genus) |>
-  summarise(total = sum(abundance)) |>
-  slice_max(total, n = 20) |>
-  pull(genus)
+  group_by(genus) |>                     # one group per genus
+  summarise(total = sum(abundance)) |>   # collapse each genus to its grand total
+  slice_max(total, n = 20) |>            # keep the 20 largest (dplyr's top-n helper)
+  pull(genus)                            # pull() extracts that column as a plain vector
 
-# Mean relative abundance of those genera per region.
+# Step 2: for those genera, compute each one's MEAN relative abundance per region.
 heat <- ab_long |>
-  filter(genus %in% top_genera) |>
-  left_join(select(meta, sample_id, nationality), by = "sample_id") |>
+  filter(genus %in% top_genera) |>                                  # keep only the top 20
+  left_join(select(meta, sample_id, nationality), by = "sample_id") |>  # attach each sample's region
   group_by(sample_id) |>
-  mutate(rel = abundance / sum(abundance)) |>
+  mutate(rel = abundance / sum(abundance)) |>   # within-sample proportion (removes depth differences)
   group_by(nationality, genus) |>
+  summarise(mean_rel = mean(rel), .groups = "drop")   # average the proportion within each region
+
+# Step 3: draw the tile grid. x = region, y = genus, fill = mean proportion.
+ggplot(heat, aes(x = nationality,
+                 y = fct_reorder(genus, mean_rel, sum),   # order genera by overall abundance (tidy y-axis)
+                 fill = mean_rel)) +
+  geom_tile(colour = "white") +                                   # one coloured tile per (region, genus)
+  scale_fill_viridis_c(option = "C", labels = scales::percent) +  # perceptually-uniform colour, % labels
+  labs(title = "Top 20 genera across regions",
+       x = NULL, y = NULL, fill = "Mean\nrel. abund.") +
+  theme_minimal(base_size = 11) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))         # tilt region labels so they don't collide
+```
+
+**A second angle — the same tiles, but per BMI group.** A heatmap is just a
+summary table with colour: swap the grouping variable and you ask a different
+biological question with almost the same code.
+
+```{r heatmap-bmi, fig.height=6}
+# Same top genera, but now average their relative abundance across BMI groups.
+heat_bmi <- ab_long |>
+  filter(genus %in% top_genera) |>
+  left_join(select(meta, sample_id, bmi_group), by = "sample_id") |>  # attach BMI instead of region
+  filter(!is.na(bmi_group)) |>                                        # drop samples with no BMI label
+  group_by(sample_id) |>
+  mutate(rel = abundance / sum(abundance)) |>                         # within-sample proportion again
+  group_by(bmi_group, genus) |>
   summarise(mean_rel = mean(rel), .groups = "drop")
 
-ggplot(heat, aes(x = nationality,
-                 y = fct_reorder(genus, mean_rel, sum),
-                 fill = mean_rel)) +
+ggplot(heat_bmi, aes(x = bmi_group,
+                     y = fct_reorder(genus, mean_rel, sum),
+                     fill = mean_rel)) +
   geom_tile(colour = "white") +
   scale_fill_viridis_c(option = "C", labels = scales::percent) +
-  labs(title = "Top 20 genera across regions",
+  labs(title = "Top 20 genera across BMI groups",
        x = NULL, y = NULL, fill = "Mean\nrel. abund.") +
   theme_minimal(base_size = 11) +
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
@@ -96,24 +125,27 @@ Do phyla trade off against each other across samples? Build a sample × phylum
 relative-abundance matrix and correlate the columns.
 
 ```{r corr, fig.height=5}
+# Build a sample x phylum matrix of relative abundances.
 phy_wide <- ab_long |>
   group_by(sample_id, phylum) |>
-  summarise(a = sum(abundance), .groups = "drop") |>
+  summarise(a = sum(abundance), .groups = "drop") |>  # total reads per phylum in each sample
   group_by(sample_id) |>
-  mutate(rel = a / sum(a)) |>
-  ungroup() |>                          # important: drop the sample_id grouping
+  mutate(rel = a / sum(a)) |>           # convert to within-sample proportion
+  ungroup() |>                          # important: drop the sample_id grouping before reshaping
   select(sample_id, phylum, rel) |>
-  pivot_wider(names_from = phylum, values_from = rel, values_fill = 0)
+  pivot_wider(names_from = phylum, values_from = rel, values_fill = 0)  # long -> wide; missing = 0
 
-cmat <- cor(as.matrix(select(phy_wide, -sample_id)))
-round(cmat, 2)
+# cor() correlates the COLUMNS pairwise -> a phylum x phylum correlation matrix.
+cmat <- cor(as.matrix(select(phy_wide, -sample_id)))  # drop the id column; cor() needs a numeric matrix
+round(cmat, 2)                                         # peek at the numbers (rounded)
 
-# Visualise the correlation matrix as a heatmap.
+# Visualise that square matrix as a heatmap: reshape it back to long, then tile it.
 as.data.frame(cmat) |>
-  rownames_to_column("phylum1") |>
-  pivot_longer(-phylum1, names_to = "phylum2", values_to = "r") |>
+  rownames_to_column("phylum1") |>                         # matrix row names -> a real column
+  pivot_longer(-phylum1, names_to = "phylum2", values_to = "r") |>  # one row per phylum-pair
   ggplot(aes(phylum1, phylum2, fill = r)) +
   geom_tile(colour = "white") +
+  # gradient2 = a DIVERGING scale: blue (negative) - white (0) - red (positive), centred at 0.
   scale_fill_gradient2(low = "steelblue", mid = "white", high = "firebrick",
                        midpoint = 0, limits = c(-1, 1)) +
   labs(title = "Correlation between phyla (relative abundance)",
@@ -133,22 +165,40 @@ Principal Component Analysis summarises many correlated variables into a few
 axes. We ordinate samples by their phylum profile and colour by region.
 
 ```{r pca, fig.height=5}
+# prcomp() needs a plain numeric matrix with samples as ROW NAMES (not a column).
 mat <- phy_wide |> column_to_rownames("sample_id") |> as.matrix()
 
-pca <- prcomp(mat, scale. = TRUE)      # PCA on the phylum relative abundances
-var_expl <- round(100 * pca$sdev^2 / sum(pca$sdev^2), 1)   # % variance per axis
+pca <- prcomp(mat, scale. = TRUE)      # PCA; scale. = TRUE standardises each phylum first
+var_expl <- round(100 * pca$sdev^2 / sum(pca$sdev^2), 1)   # % variance captured by each axis
 
+# pca$x holds the sample coordinates; we keep the first two axes (PC1, PC2) for a 2-D plot.
 scores <- as.data.frame(pca$x[, 1:2]) |>
-  rownames_to_column("sample_id") |>
-  left_join(select(meta, sample_id, nationality), by = "sample_id")
+  rownames_to_column("sample_id") |>                                  # row names -> a column to join on
+  left_join(select(meta, sample_id, nationality), by = "sample_id")   # attach region for colouring
 
 ggplot(scores, aes(PC1, PC2, colour = nationality)) +
   geom_point(alpha = 0.6, size = 1.6) +
-  stat_ellipse(level = 0.7) +
+  stat_ellipse(level = 0.7) +          # 70% confidence ellipse per region (visual grouping)
   labs(title = "PCA of gut communities (phylum level)",
-       x = paste0("PC1 (", var_expl[1], "%)"),
+       x = paste0("PC1 (", var_expl[1], "%)"),   # show variance explained in the axis label
        y = paste0("PC2 (", var_expl[2], "%)"),
        colour = "Region") +
+  theme_minimal()
+```
+
+**A second, complementary view — the scree plot.** Before trusting a 2-D
+ordination, check *how much* variance PC1 and PC2 actually capture. A **scree
+plot** of the per-axis variance answers that in one glance.
+
+```{r pca-scree, fig.height=4}
+# Turn the var_expl vector into a small data frame, one row per principal component.
+scree <- tibble(pc = factor(seq_along(var_expl)), variance = var_expl)
+
+ggplot(head(scree, 8), aes(pc, variance)) +   # first 8 axes are plenty to see the "elbow"
+  geom_col(fill = "steelblue") +
+  geom_text(aes(label = paste0(variance, "%")), vjust = -0.3, size = 3) +  # label each bar
+  labs(title = "Variance explained by each principal component",
+       x = "Principal component", y = "% variance") +
   theme_minimal()
 ```
 
