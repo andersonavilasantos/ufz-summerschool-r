@@ -2882,7 +2882,7 @@ need and locates the <code>data/</code> folder whether you knit from the
 <span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co"># This one-liner picks whichever path actually exists, so the lesson runs either way.</span></span>
 <span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>data_dir <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="fu">file.exists</span>(<span class="st">&quot;../data/sample_metadata.csv&quot;</span>)) <span class="st">&quot;../data&quot;</span> <span class="cf">else</span> <span class="st">&quot;data&quot;</span></span></code></pre></div>
 <blockquote>
-<p>📌 <strong>Teaching note.</strong> If someone gets a “file not found”
+<p><strong>Instructor note.</strong> If someone gets a “file not found”
 error, it is almost always the working directory. Opening the
 <code>.Rproj</code> fixes this by anchoring the project root. The line
 above makes the lessons robust either way.</p>
@@ -2990,7 +2990,7 @@ commands you will run first on every new table.</p>
 <p><code>glimpse()</code> is the best single overview: it lists every
 column, its type, and the first few values — transposed so wide tables
 still fit.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">glimpse</span>(meta)    <span class="co"># one row per COLUMN: name, type (&lt;chr&gt;/&lt;dbl&gt;/…), and first values</span></span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">glimpse</span>(meta)    <span class="co"># one row per column: name, type (&lt;chr&gt;/&lt;dbl&gt;/…), and first values</span></span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt; Rows: 1,006</span></span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; Columns: 7</span></span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt; $ sample_id         &lt;chr&gt; &quot;Sample-1&quot;, &quot;Sample-2&quot;, &quot;Sample-3&quot;, &quot;Sample-4&quot;, &quot;Sam…</span></span>
@@ -3027,11 +3027,10 @@ counts of <code>NA</code>).</p>
 <span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co">#&gt;                                        Max.   :6.280    </span></span>
 <span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co">#&gt; </span></span></code></pre></div>
 <blockquote>
-<p>📌 <strong>Teaching note.</strong> Point at the
-<code>summary()</code> output for <code>age</code>: it lists
-<code>NA&#39;s</code>. Real data is messy — this dataset genuinely has
-missing ages and sexes, which we will handle honestly rather than
-hide.</p>
+<p><strong>Instructor note.</strong> Point at the <code>summary()</code>
+output for <code>age</code>: it lists <code>NA&#39;s</code>. Real data is
+messy, and this dataset genuinely has missing ages and sexes, which we
+will handle honestly rather than hide.</p>
 </blockquote>
 <div id="exercise-1" class="section level3">
 <h3>Exercise 1</h3>
@@ -3100,7 +3099,7 @@ meaningful order for BMI (lean → morbidly obese, not alphabetical).</p>
 <span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>bmi_levels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;underweight&quot;</span>, <span class="st">&quot;lean&quot;</span>, <span class="st">&quot;overweight&quot;</span>,</span>
 <span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>                <span class="st">&quot;obese&quot;</span>, <span class="st">&quot;severeobese&quot;</span>, <span class="st">&quot;morbidobese&quot;</span>)</span>
 <span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co"># &#39;|&gt;&#39; pipes meta into mutate(); read it as &quot;take meta, THEN change these columns&quot;.</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co"># &#39;|&gt;&#39; pipes meta into mutate(); read it as &quot;take meta, then change these columns&quot;.</span></span>
 <span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>meta <span class="ot">&lt;-</span> meta <span class="sc">|&gt;</span></span>
 <span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>    <span class="at">sex         =</span> <span class="fu">factor</span>(sex),          <span class="co"># text -&gt; factor (categories from the data)</span></span>
@@ -3120,7 +3119,7 @@ meaningful order for BMI (lean → morbidly obese, not alphabetical).</p>
 columns — we meet it properly next lesson; here it just lets us
 overwrite three columns cleanly.</p>
 <blockquote>
-<p>📌 <strong>Teaching note.</strong> Ordering a factor once, here, pays
+<p><strong>Instructor note.</strong> Ordering a factor once, here, pays
 off repeatedly: every later table and bar chart will list BMI groups in
 clinical order automatically.</p>
 </blockquote>

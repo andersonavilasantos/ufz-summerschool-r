@@ -72,7 +72,7 @@ Every ggplot is built from layers you **add with `+`**:
 
 ```{r first-plot}
 # ggplot(data, aes(...)) sets the data + the aesthetic mapping (which var -> which axis).
-# Then '+' ADDS a layer. Note: ggplot chains with '+', NOT the pipe |>.
+# Then '+' adds a layer. Note: ggplot chains with '+', not the pipe |>.
 ggplot(meta, aes(x = age, y = diversity_shannon)) +  # map age -> x, diversity -> y
   geom_point()                                        # draw one point per sample
 ```
@@ -80,8 +80,8 @@ ggplot(meta, aes(x = age, y = diversity_shannon)) +  # map age -> x, diversity -
 Read it as a sentence: *"For each sample, put `age` on x and `diversity_shannon`
 on y, and draw a point."* Everything else is refinement.
 
-> 📌 **Teaching note.** The `+` (not the pipe) chains ggplot **layers**. A common
-> beginner slip is writing `|>` between layers — flag it early.
+> **Instructor note.** The `+` (not the pipe) chains ggplot layers. A common
+> beginner slip is writing `|>` between layers, so flag it early.
 
 ---
 
@@ -90,7 +90,7 @@ on y, and draw a point."* Everything else is refinement.
 Map a third variable to **colour** and add a trend line with `geom_smooth()`.
 
 ```{r scatter-colour}
-# You can pipe data INTO ggplot(), then switch to '+' once the plot starts.
+# You can pipe data into ggplot(), then switch to '+' once the plot starts.
 meta |>
   filter(!is.na(age)) |>                                # drop samples with unknown age first
   ggplot(aes(x = age, y = diversity_shannon)) +
@@ -105,7 +105,7 @@ Colour by a category to compare groups in one panel:
 ```{r scatter-by-region}
 meta |>
   filter(!is.na(age), nationality %in% c("Scandinavia","US","SouthEurope")) |>  # 3 regions
-  # Mapping colour = nationality INSIDE aes() colours points by category automatically.
+  # Mapping colour = nationality inside aes() colours points by category automatically.
   ggplot(aes(x = age, y = diversity_shannon, colour = nationality)) +
   geom_point(alpha = 0.6) +
   labs(title = "Diversity vs. age by region", colour = "Region")  # 'colour =' renames the legend
@@ -134,7 +134,7 @@ meta |>
 One numeric variable: how is it spread?
 
 ```{r histogram}
-# A histogram needs only ONE variable (x); ggplot bins it and counts per bin.
+# A histogram needs only one variable (x); ggplot bins it and counts per bin.
 ggplot(meta, aes(x = diversity_shannon)) +
   geom_histogram(bins = 30, fill = "steelblue", colour = "white") +  # 30 bars; white bar borders
   labs(title = "Distribution of Shannon diversity",
@@ -177,7 +177,7 @@ tells the story at a glance:
 ```{r boxplot-ordered}
 meta |>
   # fct_reorder(f, x, .fun) reorders the category f by a summary of x — here each
-  # region is ordered by its MEDIAN diversity, so the boxes climb in a readable order.
+  # region is ordered by its median diversity, so the boxes climb in a readable order.
   ggplot(aes(x = fct_reorder(nationality, diversity_shannon, .fun = median),
              y = diversity_shannon)) +
   geom_boxplot(fill = "seagreen", alpha = 0.7) +
@@ -210,7 +210,7 @@ meta |>
 **already computed**. Use `geom_col()` after a `summarise()`.
 
 ```{r bar-counts}
-# geom_bar COUNTS rows for you — give it only x, no y needed.
+# geom_bar counts rows for you: give it only x, no y needed.
 meta |>
   ggplot(aes(x = fct_infreq(nationality))) +   # fct_infreq: order bars from most to least frequent
   geom_bar(fill = "darkorange") +              # bar height = number of samples in that region
@@ -219,7 +219,7 @@ meta |>
 ```
 
 ```{r bar-summary}
-# geom_col draws bars from values you ALREADY computed -> summarise first, then plot.
+# geom_col draws bars from values you already computed -> summarise first, then plot.
 meta |>
   group_by(nationality) |>
   summarise(mean_shannon = mean(diversity_shannon)) |>  # one mean per region
@@ -254,8 +254,8 @@ ggplot(composition, aes(x = nationality, y = mean_rel,
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 ```
 
-> 📌 **Teaching note.** This single figure is the payoff of the whole session:
-> the wrangling from lesson 03 feeds directly into a publication-style plot.
+> **Instructor note.** This figure ties the session together: the wrangling from
+> lesson 03 feeds directly into a publication-style plot.
 
 ---
 
@@ -284,7 +284,7 @@ meta |>
 - **Themes** (`theme_minimal`, `theme_bw`, …) set the overall look.
 
 ```{r polish, fig.height=5}
-# Store the plot in an object 'p' so we can print it AND save it later (§8).
+# Store the plot in an object 'p' so we can print it and save it later (§8).
 p <- composition |>
   filter(phylum %in% c("Firmicutes", "Bacteroidetes", "Proteobacteria",
                        "Actinobacteria")) |>                # focus on the four major phyla

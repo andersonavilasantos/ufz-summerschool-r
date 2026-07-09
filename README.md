@@ -8,15 +8,14 @@ Ecology and Biotechnology"* — UFZ, Leipzig.
 
 ---
 
-## 👋 Welcome
+## Welcome
 
-This is a **hands-on R refresher built for biologists** — you need **no prior
-programming experience** at all. Over one relaxed ~2-hour session we start from
-the very beginning (*"what is a vector?"*) and build up, step by step, to a
-complete microbial-ecology analysis on a **real, published** human-gut microbiome
-dataset.
+This is a hands-on R refresher built for biologists. You need no prior
+programming experience at all. Over one roughly 2-hour session we start from the
+very beginning ("what is a vector?") and build up, step by step, to a complete
+microbial-ecology analysis on a real, published human-gut microbiome dataset.
 
-**By the end of the session you will be able to:**
+By the end of the session you will be able to:
 
 - read and write basic R, and work in **RStudio** with confidence;
 - **import** a data table and inspect it (types, dimensions, missing values);
@@ -27,48 +26,48 @@ dataset.
 - run a small **microbial-ecology workflow** end to end: clean → wrangle →
   diversity → composition figure → a simple statistical test → export.
 
-Everything is taught on **one real dataset** (the HITChip Atlas, below), so every
-concept connects to data you actually work with — not toy numbers.
+Everything is taught on one real dataset (the HITChip Atlas, below), so every
+concept connects to data you actually work with rather than toy numbers.
 
-> This R session is the companion to the parallel **Python** refresher. It is
-> **not** a translation — it is designed around R's strengths (the tidyverse and
-> the grammar of graphics) and uses a **different, real dataset**.
+> This R session is the companion to the parallel Python refresher. It is not a
+> translation. It is designed around R's strengths (the tidyverse and the grammar
+> of graphics) and uses a different, real dataset.
 
 ---
 
-## ✅ Prerequisites — none
+## Prerequisites — none
 
-You do **not** need to know any R, Python, or programming to follow this session.
+You do not need to know any R, Python, or programming to follow this session.
 If you can open a web browser, you can do this. Everything you need is either
 installed for you (Posit Cloud) or set up by one command (`setup.R`).
 
-The only thing to decide **before** you arrive is *how* you want to run the
-lessons — see **[How to run](#-how-to-run-the-lessons)** below. If you are unsure,
-pick **Posit Cloud** (nothing to install) and you are done.
+The only thing to decide before you arrive is how you want to run the lessons.
+See [How to run](#how-to-run-the-lessons) below. If you are unsure, pick Posit
+Cloud (nothing to install) and you are done.
 
 ---
 
-## 📅 Logistics
+## Logistics
 
 | | |
 |---|---|
 | **When** | **Tuesday, 14 July 2026, 10:15–12:15** |
 | **Where** | **Building 1.0, Room 254** — UFZ, Permoserstr. 15, 04318 Leipzig |
 | **Bring** | Your **laptop and its charger** |
-| **Arrive** | ~**15 minutes early** so you can sit down, connect to Wi-Fi, and be ready to run the first chunk at 10:15 |
+| **Arrive** | about **15 minutes early** so you can sit down, connect to Wi-Fi, and be ready to run the first chunk at 10:15 |
 
-Your name will be at the entrance — please identify yourself and follow the site
-map to Building 1.0. If you plan to run the lessons **locally** (Option B), it is
-best to install R + RStudio **before** you arrive, as the downloads can be large.
-If in doubt, use **Posit Cloud** and there is nothing to install.
+Your name will be at the entrance. Please identify yourself and follow the site
+map to Building 1.0. If you plan to run the lessons locally (Option B), it is best
+to install R and RStudio before you arrive, as the downloads can be large. If in
+doubt, use Posit Cloud and there is nothing to install.
 
 ---
 
-## 🚀 How to run the lessons
+## How to run the lessons
 
-There are two ways. If you have never programmed before, **use Posit Cloud** — it
-runs RStudio in your browser with nothing to install (the R analogue of Google
-Colab). Both options use the **same** files and the **same** `setup.R`.
+There are two ways. If you have never programmed before, use Posit Cloud. It runs
+RStudio in your browser with nothing to install (the R analogue of Google Colab).
+Both options use the same files and the same `setup.R`.
 
 ### Option A — Posit Cloud (easiest, nothing to install)
 
@@ -83,25 +82,25 @@ downloads, no admin rights — perfect if you have never programmed before.
    ```
    https://github.com/andersonavilasantos/ufz-summerschool-r.git
    ```
-   Posit Cloud copies all the lessons **and the data** into your own project.
+   Posit Cloud copies all the lessons and the data into your own project.
 4. When the project opens, go to the **Console** (bottom-left) and install the
-   packages **once**:
+   packages once:
    ```r
    source("setup.R")
    ```
-   *(This takes a few minutes the first time — do it before the session if you
-   can.)*
+   This takes a few minutes the first time, so do it before the session if you
+   can.
 5. In the **Files** pane (bottom-right), open `notebooks/01_r_essentials.Rmd` and
-   either run chunks one by one (the green ▶ at each chunk's top-right) or click
-   **Knit** to build the HTML.
+   either run chunks one by one (the green run button at each chunk's top-right)
+   or click **Knit** to build the HTML.
 
-> The data ships **with** the repository (it is public-domain, CC0), so nothing
-> needs to be downloaded separately — the lessons just work.
+> The data ships with the repository (it is public-domain, CC0), so nothing needs
+> to be downloaded separately. The lessons just work.
 
 ### Option B — On your own computer (local RStudio)
 
-Best if you would rather keep everything offline. Please install **before** the
-session — the downloads are large.
+Best if you would rather keep everything offline. Please install before the
+session, as the downloads are large.
 
 1. Install **R** — https://cran.r-project.org
 2. Install **RStudio Desktop** (free) — https://posit.co/download/rstudio-desktop/
@@ -110,18 +109,18 @@ session — the downloads are large.
    git clone https://github.com/andersonavilasantos/ufz-summerschool-r.git
    ```
    *(No git? On the GitHub page click **Code ▸ Download ZIP** and unzip it.)*
-4. Open **`ufz-summerschool-r.Rproj`** in RStudio by double-clicking it (this
+4. Open **`ufz-summerschool-r.Rproj`** in RStudio by double-clicking it. This
    anchors the working directory to the project, which prevents "file not found"
-   errors).
-5. In the **Console**, install everything **once**:
+   errors.
+5. In the **Console**, install everything once:
    ```r
    source("setup.R")
    ```
-6. Open the lessons in `notebooks/` **in order** and run or **Knit** them.
+6. Open the lessons in `notebooks/` in order and run or **Knit** them.
 
 ---
 
-## 📚 What's inside
+## What's inside
 
 ### Core session (~2 h taught live)
 
@@ -133,14 +132,14 @@ session — the downloads are large.
 | 04 | [Visualization (ggplot2)](notebooks/04_visualization_ggplot2.Rmd) | 40 | grammar of graphics: scatter, histogram, boxplot, bar/stacked, colour, **faceting**, themes, `ggsave` |
 | 05 | [Capstone project](notebooks/05_capstone_project.Rmd) | 45–60 | **fill-in** guided analysis (blank chunks + collapsible solutions): clean → reshape → join → diversity → figures → ANOVA → **NMDS** → export |
 
-Every lesson opens with **learning objectives**, is full of runnable examples
-with **line-by-line comments** (so it can be taught straight from the chunks),
-has **exercises with collapsible solutions**, **📌 Teaching-note** callouts, and
-closes with a **recap**.
+Every lesson opens with learning objectives, is full of runnable examples with
+line-by-line comments (so it can be taught straight from the chunks), has
+exercises with collapsible solutions, instructor-note callouts, and closes with a
+recap.
 
 > The core is deliberately padded so it can flex to the room. In a 2-hour slot,
-> teach **01–04** live and use **07** as the worked demo; run **05** (fill-in
-> capstone) live if time allows, or hand it out for self-study.
+> teach 01–04 live and use 07 as the worked demo. Run 05 (the fill-in capstone)
+> live if time allows, or hand it out for self-study.
 
 ### Optional / extension
 
@@ -149,22 +148,22 @@ closes with a **recap**.
 | 06 | [Bonus — heatmaps, correlation, PCA](notebooks/06_bonus_heatmap_ordination.Rmd) | if the session finishes early: an abundance **heatmap**, a phylum **correlation** map, and a **PCA** ordination (with a scree plot) — all CRAN-only |
 | 07 | [Worked analysis](notebooks/07_worked_analysis.Rmd) | the **fully worked, read-and-run** version of the capstone — every chunk written out, end-to-end (import → clean → wrangle → summarise → 3 figures → ANOVA + Tukey → **NMDS** → export). Use as the instructor's live demo or as the capstone's worked solution |
 
-**Suggested flow:** teach **01–04** live; use **05** (fill-in capstone) so
-participants *do* the analysis in pairs; use **07** as the worked solution / live
-demo of the same analysis; keep **06** as a buffer / self-study.
+**Suggested flow:** teach 01–04 live; use 05 (the fill-in capstone) so
+participants do the analysis in pairs; use 07 as the worked solution or live demo
+of the same analysis; keep 06 as a buffer or for self-study.
 
-> **Two distinct capstone experiences** (mirroring the parallel Python course):
-> **05** is the *fill-in activity* students complete themselves; **07** is the
-> *fully worked reference analysis* they can read and run start to finish.
+> Two distinct capstone experiences (mirroring the parallel Python course): 05 is
+> the fill-in activity students complete themselves; 07 is the fully worked
+> reference analysis they can read and run start to finish.
 
-> Pre-rendered **HTML** versions of each lesson sit next to the `.Rmd` files and
-> are **committed** with the course, so you can open `notebooks/*.html` in any
-> browser and read a lesson (with all figures) **without running R** — handy for
-> revising later or if setup fails.
+> Pre-rendered HTML versions of each lesson sit next to the `.Rmd` files and are
+> committed with the course, so you can open `notebooks/*.html` in any browser and
+> read a lesson (with all figures) without running R. This is handy for revising
+> later or if setup fails.
 
 ---
 
-## 🧬 The data (`data/`)
+## The data (`data/`)
 
 We use the **HITChip Atlas** — a *real, published* human-gut microbiome study of
 **1,006 healthy Western adults**, profiling **130 genus-like taxa**, from:
@@ -192,17 +191,17 @@ source("data/get_data.R")
 ```
 
 **Why this dataset:** it is real and published, has a genuine ecological signal
-(e.g. the Firmicutes/Bacteroidetes balance, diversity varying with age and
-region), several **categorical** (sex, nationality, BMI group) and **numeric**
-(age, diversity, 130 abundances) variables, real **missing values** to teach
-cleaning, and 1,006 rows — big enough to make `group_by`/`summarise` and faceted
-plots meaningful. It needs **CRAN only** (no Bioconductor).
+(for example the Firmicutes/Bacteroidetes balance, and diversity varying with age
+and region), several categorical (sex, nationality, BMI group) and numeric (age,
+diversity, 130 abundances) variables, real missing values to teach cleaning, and
+1,006 rows, which is big enough to make `group_by`/`summarise` and faceted plots
+meaningful. It needs CRAN only, no Bioconductor.
 
 ---
 
-## 🆘 Troubleshooting & FAQ (for beginners)
+## Troubleshooting and FAQ (for beginners)
 
-Almost every first-day error is one of these. Don't worry — they are normal.
+Almost every first-day error is one of these, and they are all normal.
 
 - **`could not find function "read_csv"` (or `mutate`, `ggplot`, `diversity`…).**
   The package that provides that function is not loaded. Run `source("setup.R")`
@@ -220,11 +219,11 @@ Almost every first-day error is one of these. Don't worry — they are normal.
   end of a line.** In **ggplot2** you join layers with `+`, and the `+` must be
   at the **end** of the line, never the start:
   ```r
-  ggplot(meta, aes(age, diversity_shannon)) +   # ✅ + at the end
+  ggplot(meta, aes(age, diversity_shannon)) +   # correct: + at the end
     geom_point()
 
-  ggplot(meta, aes(age, diversity_shannon))     # ❌ this ends the statement…
-    + geom_point()                              #    …so this line errors
+  ggplot(meta, aes(age, diversity_shannon))     # wrong: this ends the statement,
+    + geom_point()                              #   so the next line errors
   ```
   (Also: chain **ggplot layers with `+`**, but chain **data steps with the pipe
   `|>` / `%>%`** — mixing them up is the most common ggplot slip.)
@@ -247,13 +246,13 @@ Almost every first-day error is one of these. Don't worry — they are normal.
   every object a chunk needs is created **earlier in the same file**, then Knit
   again.
 
-Still stuck? Just ask during the session — that is exactly what it's for. You can
+Still stuck? Just ask during the session; that is exactly what it is for. You can
 also open the committed `notebooks/*.html` files in a browser to read any lesson
 without running R.
 
 ---
 
-## 🗂️ Repository structure
+## Repository structure
 
 ```
 R 2026/
@@ -270,16 +269,16 @@ R 2026/
 
 ---
 
-## 📦 Requirements
+## Requirements
 
-Everything is installed by **`setup.R`** (all from CRAN — no Bioconductor):
-`readr`, `dplyr`, `tidyr`, `tibble`, `ggplot2`, `forcats`, `stringr`, `vegan`,
-plus `rmarkdown` + `knitr` to knit the lessons. You need **R ≥ 4.1** (for the
-native pipe `|>`); any recent R and RStudio (or Posit Cloud) is fine.
+Everything is installed by `setup.R` (all from CRAN, no Bioconductor): `readr`,
+`dplyr`, `tidyr`, `tibble`, `ggplot2`, `forcats`, `stringr`, `vegan`, plus
+`rmarkdown` and `knitr` to knit the lessons. You need R ≥ 4.1 (for the native
+pipe `|>`); any recent R and RStudio (or Posit Cloud) is fine.
 
 ---
 
-## 📄 License
+## License
 
 Teaching materials: **Creative Commons Attribution 3.0 (CC BY 3.0)** — see
 [LICENSE](LICENSE).

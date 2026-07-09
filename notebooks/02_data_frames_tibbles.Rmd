@@ -44,7 +44,7 @@ library(tibble)    # modern data frames ("tibbles")
 data_dir <- if (file.exists("../data/sample_metadata.csv")) "../data" else "data"
 ```
 
-> 📌 **Teaching note.** If someone gets a "file not found" error, it is almost
+> **Instructor note.** If someone gets a "file not found" error, it is almost
 > always the working directory. Opening the `.Rproj` fixes this by anchoring the
 > project root. The line above makes the lessons robust either way.
 
@@ -105,7 +105,7 @@ names(meta)      # the column names, i.e. the variable names in this table
 the first few values — transposed so wide tables still fit.
 
 ```{r}
-glimpse(meta)    # one row per COLUMN: name, type (<chr>/<dbl>/…), and first values
+glimpse(meta)    # one row per column: name, type (<chr>/<dbl>/…), and first values
 ```
 
 `head()` / `tail()` show the first / last rows; `summary()` gives per-column
@@ -116,9 +116,9 @@ head(meta, 4)    # the first 4 rows — a quick sanity check that import worked
 summary(meta)    # per-column stats: min/median/max for numbers, counts of NA's
 ```
 
-> 📌 **Teaching note.** Point at the `summary()` output for `age`: it lists
-> `NA's`. Real data is messy — this dataset genuinely has missing ages and sexes,
-> which we will handle honestly rather than hide.
+> **Instructor note.** Point at the `summary()` output for `age`: it lists
+> `NA's`. Real data is messy, and this dataset genuinely has missing ages and
+> sexes, which we will handle honestly rather than hide.
 
 ### Exercise 1
 
@@ -179,7 +179,7 @@ meaningful order for BMI (lean → morbidly obese, not alphabetical).
 bmi_levels <- c("underweight", "lean", "overweight",
                 "obese", "severeobese", "morbidobese")
 
-# '|>' pipes meta into mutate(); read it as "take meta, THEN change these columns".
+# '|>' pipes meta into mutate(); read it as "take meta, then change these columns".
 meta <- meta |>
   mutate(
     sex         = factor(sex),          # text -> factor (categories from the data)
@@ -195,7 +195,7 @@ table(meta$bmi_group)      # the counts now print in that clinical order
 `mutate()` (from **dplyr**) adds or changes columns — we meet it properly next
 lesson; here it just lets us overwrite three columns cleanly.
 
-> 📌 **Teaching note.** Ordering a factor once, here, pays off repeatedly: every
+> **Instructor note.** Ordering a factor once, here, pays off repeatedly: every
 > later table and bar chart will list BMI groups in clinical order automatically.
 
 ### Exercise 2

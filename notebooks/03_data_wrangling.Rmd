@@ -65,10 +65,10 @@ glimpse(meta)      # quick check: columns, types, first values
 # Keep only rows where nationality equals "Scandinavia" ('==' tests equality).
 meta |> filter(nationality == "Scandinavia")
 
-# Multiple conditions separated by a comma are combined with AND (both must hold).
-meta |> filter(bmi_group == "lean", age > 50)   # lean AND older than 50
+# Multiple conditions separated by a comma are combined with "and" (both must hold).
+meta |> filter(bmi_group == "lean", age > 50)   # lean and older than 50
 
-# Pipe the filtered rows into nrow() to just COUNT them, not print them.
+# Pipe the filtered rows into nrow() to just count them, not print them.
 meta |> filter(diversity_shannon > 6) |> nrow() # how many high-diversity samples?
 ```
 
@@ -98,8 +98,8 @@ meta |>
 ## 2 · `select()` — keep the columns you want
 
 ```{r}
-meta |> select(sample_id, age, bmi_group)      # keep ONLY these three columns, in this order
-meta |> select(-subject_id)                    # a leading '-' DROPS a column, keep the rest
+meta |> select(sample_id, age, bmi_group)      # keep only these three columns, in this order
+meta |> select(-subject_id)                    # a leading '-' drops a column, keep the rest
 meta |> select(sample_id, starts_with("div"))  # starts_with(): match columns by name prefix
 ```
 
@@ -179,13 +179,13 @@ meta |> arrange(nationality, desc(age)) |> head(3)   # sort by region, then olde
 
 ---
 
-## 5 · `group_by()` + `summarise()` — the heart of analysis
+## 5 · `group_by()` + `summarise()` — the core of analysis
 
 This pattern answers almost every "…per group?" question. `group_by()` splits the
 data into groups; `summarise()` collapses each group to one row of statistics.
 
 ```{r}
-# group_by() tags the rows by nationality; summarise() then collapses EACH group to one row.
+# group_by() tags the rows by nationality; summarise() then collapses each group to one row.
 # (group_by must come first — summarise operates within whatever groups are set.)
 meta |>
   group_by(nationality) |>
@@ -207,9 +207,9 @@ meta |>
   head(8)
 ```
 
-> 📌 **Teaching note.** `summarise()` is where biology appears: "mean diversity
-> per region", "richness per BMI class". Emphasise the mental model —
-> **split → apply → combine**.
+> **Instructor note.** `summarise()` is where the biology appears: "mean
+> diversity per region", "richness per BMI class". Emphasise the mental model of
+> split, apply, combine.
 
 ### Exercise 3
 
@@ -239,9 +239,9 @@ observation is "one genus in one sample".
 # pivot_longer stacks many columns into two: one for the old names, one for the values.
 abund_long <- abund |>
   pivot_longer(
-    cols      = -sample_id,   # pivot every column EXCEPT sample_id (the '-' excludes it)
-    names_to  = "genus",      # the old column NAMES (genus names) fill this new column
-    values_to = "abundance"   # the old cell VALUES (counts) fill this new column
+    cols      = -sample_id,   # pivot every column except sample_id (the '-' excludes it)
+    names_to  = "genus",      # the old column names (genus names) fill this new column
+    values_to = "abundance"   # the old cell values (counts) fill this new column
   )
 
 abund_long          # tall table: 1006 samples x 130 genera = 130,780 rows, one per pair
@@ -258,8 +258,8 @@ abund_long |>
   head()
 ```
 
-> 📌 **Teaching note.** "Long for computing and plotting, wide for reading and
-> matrices." This single idea unlocks most day-to-day omics wrangling.
+> **Instructor note.** "Long for computing and plotting, wide for reading and
+> matrices." This single idea covers most day-to-day omics wrangling.
 
 ---
 
@@ -270,7 +270,7 @@ that mapping. `left_join()` glues columns from `taxonomy` onto matching rows of
 `abund_long`, matching on the shared `genus` column.
 
 ```{r}
-# left_join keeps every row of the LEFT table (abund_long) and pastes on matching
+# left_join keeps every row of the left table (abund_long) and pastes on matching
 # taxonomy columns where the 'genus' key agrees.
 abund_tax <- abund_long |>
   left_join(taxonomy, by = "genus")     # each row now also knows its phylum & family
@@ -292,9 +292,9 @@ full <- abund_tax |>
 glimpse(full)      # every row = one genus, in one sample, with its taxonomy + participant info
 ```
 
-> 📌 **Teaching note.** `left_join` keeps every row of the *left* table and adds
+> **Instructor note.** `left_join` keeps every row of the left table and adds
 > matching info from the right. If a genus were missing from `taxonomy`, its
-> `phylum` would be `NA` — a quick way to catch mismatches.
+> `phylum` would be `NA`, which is a quick way to catch mismatches.
 
 ### Exercise 4
 

@@ -47,13 +47,13 @@ To run one line of a lesson, click inside a grey **code chunk** and press
 **Ctrl+Enter** (Windows) / **Cmd+Enter** (Mac). To run a whole chunk, press the
 green ▶ button at its top-right.
 
-> 📌 **Teaching note.** Have participants run the very first chunk below live.
+> **Instructor note.** Have participants run the very first chunk below live.
 > Seeing a number appear in the console is the "hello world" moment that makes R
 > feel real.
 
 ```{r}
-# Anything after a '#' is a COMMENT: R ignores it. Use comments generously.
-# The line below is an EXPRESSION. Run it and R prints the result.
+# Anything after a '#' is a comment: R ignores it. Use comments generously.
+# The line below is an expression. Run it and R prints the result.
 2 + 2
 ```
 
@@ -66,7 +66,7 @@ We store values in **objects** using the assignment arrow `<-`
 
 ```{r}
 # Store the number of samples in our dataset in an object called n_samples.
-n_samples <- 1006          # '<-' is R's assignment arrow: put 1006 INTO n_samples
+n_samples <- 1006          # '<-' is R's assignment arrow: put 1006 into n_samples
                            # (in R we use '<-', not '='; think of it as "gets")
 
 n_samples                  # type an object's name on its own line -> R prints it
@@ -79,14 +79,14 @@ n_samples * n_taxa         # samples x genera = total cells in the abundance tab
 R has a few basic **types** of value. The function `class()` tells you which:
 
 ```{r}
-# class() reveals the TYPE of a value — getting types wrong is a top beginner bug.
+# class() reveals the type of a value; getting types wrong is a common beginner bug.
 class(3.14)                # "numeric"  -> numbers (decimals); R's default number type
 class(42L)                 # "integer"  -> a whole number; the trailing L forces integer
-class("Firmicutes")        # "character"-> text; ALWAYS wrapped in quotes, e.g. a taxon name
+class("Firmicutes")        # "character"-> text; always wrapped in quotes, e.g. a taxon name
 class(TRUE)                # "logical"  -> TRUE / FALSE, the result of a yes/no test
 ```
 
-> 📌 **Teaching note.** Beginners mix up `=` and `<-`. Both can assign, but the
+> **Instructor note.** Beginners mix up `=` and `<-`. Both can assign, but the
 > community convention is `<-` for assignment and `=` only for function
 > arguments. Point out RStudio's shortcut **Alt+-** which types ` <- ` for you.
 
@@ -107,13 +107,13 @@ class(abundance)   # "numeric"
 
 ---
 
-## 2 · Vectors — the heart of R
+## 2 · Vectors — R's core object
 
 A **vector** is an ordered collection of values *of the same type*. You build one
 with `c()` ("combine"). Almost everything in R is a vector.
 
 ```{r}
-# c() = "combine": glue values into a vector. All elements share ONE type.
+# c() = "combine": glue values into a vector. All elements share one type.
 # Here: five common human-gut genera as a character (text) vector.
 genera <- c("Bacteroides", "Prevotella", "Faecalibacterium",
             "Escherichia", "Akkermansia")
@@ -124,11 +124,11 @@ counts <- c(1820, 640, 2310, 95, 210)   # element i is the count of genus i
 counts
 ```
 
-The magic of R: operations apply to **every element at once** (this is called
-*vectorisation*) — no loops needed.
+A useful feature of R: operations apply to every element at once. This is called
+*vectorisation*, and it means you rarely need a loop.
 
 ```{r}
-# Vectorisation: the operation is applied to EVERY element at once, no loop needed.
+# Vectorisation: the operation is applied to every element at once, no loop needed.
 counts * 2            # multiply each count by 2 -> a new 5-element vector
 counts / sum(counts)  # each count / the total = its proportion of the community
 log(counts)           # natural log of each value (common for skewed abundance data)
@@ -150,14 +150,14 @@ min(counts)      # the smallest count (the rarest genus)
 R counts **from 1** (not 0). Use square brackets `[ ]` to pick elements.
 
 ```{r}
-# Square brackets pick elements by position. R starts counting at 1 (not 0!).
+# Square brackets pick elements by position. R starts counting at 1, not 0.
 genera[1]            # the 1st genus ("Bacteroides")
 genera[c(1, 3)]      # pass a vector of positions -> the 1st and 3rd genera
 counts[counts > 500] # logical filter: keep only the counts greater than 500
 ```
 
-That last line is powerful: `counts > 500` produces `TRUE/FALSE`, and R keeps the
-`TRUE` positions. You will use this idea constantly.
+That last line does a lot of work: `counts > 500` produces `TRUE/FALSE`, and R
+keeps the `TRUE` positions. You will use this idea constantly.
 
 ```{r}
 # The comparison itself produces a TRUE/FALSE vector, one entry per element:
@@ -178,7 +178,7 @@ mean(ages, na.rm = TRUE)        # na.rm = TRUE drops the NA, then averages the r
 is.na(ages)                     # TRUE exactly at the missing position, FALSE elsewhere
 ```
 
-> 📌 **Teaching note.** `NA` is *not* zero and *not* the text "NA". It is a
+> **Instructor note.** `NA` is not zero and not the text "NA". It is a
 > first-class "unknown". This distinction saves people from silent bugs later.
 
 ### Exercise 2
@@ -206,7 +206,7 @@ special type called a **factor**. Factors remember the full set of categories
 ```{r}
 # Start with plain text categories (one BMI class per participant):
 bmi <- c("lean", "obese", "lean", "overweight", "obese", "lean")
-# factor() converts text -> a factor; 'levels' fixes the categories AND their order
+# factor() converts text -> a factor; 'levels' fixes the categories and their order
 # (we choose lean < overweight < obese, a meaningful order, not alphabetical).
 bmi_f <- factor(bmi, levels = c("lean", "overweight", "obese"))
 bmi_f
@@ -238,7 +238,7 @@ Arguments can have **defaults**:
 
 ```{r}
 # Shannon diversity — a real ecology metric we reuse all week.
-# 'base = exp(1)' is a DEFAULT: if the caller omits base, natural log is used.
+# 'base = exp(1)' is a default: if the caller omits base, natural log is used.
 shannon <- function(counts, base = exp(1)) {
   p <- counts[counts > 0] / sum(counts)  # keep present taxa, convert to proportions
   -sum(p * log(p, base = base))          # the Shannon formula: -sum(p * log p)
@@ -276,11 +276,11 @@ R has two pipes that behave the same for our purposes:
 - `%>%` — the **magrittr** pipe from the tidyverse. You will see it everywhere.
 
 ```{r}
-# Without a pipe: calls nest inside each other, so you read INSIDE-OUT (awkward).
+# Without a pipe: calls nest inside each other, so you read inside-out (awkward).
 round(mean(counts), 1)
 
-# With the native pipe: read LEFT-TO-RIGHT. Read '|>' as the word "then".
-counts |> mean() |> round(1)   # take counts, THEN mean(), THEN round to 1 decimal
+# With the native pipe: read left-to-right. Read '|>' as the word "then".
+counts |> mean() |> round(1)   # take counts, then mean(), then round to 1 decimal
 ```
 
 The tidyverse's `%>%` pipe (from **magrittr**) does the same thing. You will see
@@ -295,7 +295,7 @@ counts %>% mean() %>% round(1) # identical result to the |> version above
 We use the pipe constantly in the wrangling and plotting lessons, because it
 lets us write "filter, then group, then summarise" as one readable flow.
 
-> 📌 **Teaching note.** Type the pipe with **Ctrl+Shift+M**. In RStudio you can
+> **Instructor note.** Type the pipe with **Ctrl+Shift+M**. In RStudio you can
 > set *Tools ▸ Global Options ▸ Code* to make that shortcut insert the native
 > `|>`.
 

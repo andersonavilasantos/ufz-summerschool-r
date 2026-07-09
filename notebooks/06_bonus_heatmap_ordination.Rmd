@@ -43,7 +43,7 @@ library(ggplot2); library(forcats); library(tibble)  # plot, reorder factors, ro
 data_dir <- if (file.exists("../data/sample_metadata.csv")) "../data" else "data"
 meta     <- read_csv(file.path(data_dir, "sample_metadata.csv"))  # one row per sample (participant)
 taxonomy <- read_csv(file.path(data_dir, "taxonomy.csv"))         # genus -> family / phylum lookup
-abund    <- read_csv(file.path(data_dir, "genus_abundance.csv"))  # WIDE: one column per genus
+abund    <- read_csv(file.path(data_dir, "genus_abundance.csv"))  # wide: one column per genus
 
 # Reshape wide -> long (tidyverse verbs want long data), then attach each genus's phylum.
 ab_long <- abund |>
@@ -59,14 +59,14 @@ ab_long <- abund |>
 abundance per region, and draw a tile grid — colour = abundance.
 
 ```{r heatmap, fig.height=6}
-# Step 1: find the 20 genera with the highest TOTAL abundance across the whole study.
+# Step 1: find the 20 genera with the highest total abundance across the whole study.
 top_genera <- ab_long |>
   group_by(genus) |>                     # one group per genus
   summarise(total = sum(abundance)) |>   # collapse each genus to its grand total
   slice_max(total, n = 20) |>            # keep the 20 largest (dplyr's top-n helper)
   pull(genus)                            # pull() extracts that column as a plain vector
 
-# Step 2: for those genera, compute each one's MEAN relative abundance per region.
+# Step 2: for those genera, compute each one's mean relative abundance per region.
 heat <- ab_long |>
   filter(genus %in% top_genera) |>                                  # keep only the top 20
   left_join(select(meta, sample_id, nationality), by = "sample_id") |>  # attach each sample's region
@@ -113,8 +113,8 @@ ggplot(heat_bmi, aes(x = bmi_group,
   theme(axis.text.x = element_text(angle = 30, hjust = 1))
 ```
 
-> 📌 **Teaching note.** `viridis` palettes are perceptually uniform and
-> colour-blind-friendly — a good default for heatmaps. `scale_fill_viridis_c()`
+> **Instructor note.** `viridis` palettes are perceptually uniform and
+> colour-blind-friendly, a good default for heatmaps. `scale_fill_viridis_c()`
 > ships with ggplot2, no extra package needed.
 
 ---
@@ -135,7 +135,7 @@ phy_wide <- ab_long |>
   select(sample_id, phylum, rel) |>
   pivot_wider(names_from = phylum, values_from = rel, values_fill = 0)  # long -> wide; missing = 0
 
-# cor() correlates the COLUMNS pairwise -> a phylum x phylum correlation matrix.
+# cor() correlates the columns pairwise -> a phylum x phylum correlation matrix.
 cmat <- cor(as.matrix(select(phy_wide, -sample_id)))  # drop the id column; cor() needs a numeric matrix
 round(cmat, 2)                                         # peek at the numbers (rounded)
 
@@ -145,7 +145,7 @@ as.data.frame(cmat) |>
   pivot_longer(-phylum1, names_to = "phylum2", values_to = "r") |>  # one row per phylum-pair
   ggplot(aes(phylum1, phylum2, fill = r)) +
   geom_tile(colour = "white") +
-  # gradient2 = a DIVERGING scale: blue (negative) - white (0) - red (positive), centred at 0.
+  # gradient2 = a diverging scale: blue (negative) - white (0) - red (positive), centred at 0.
   scale_fill_gradient2(low = "steelblue", mid = "white", high = "firebrick",
                        midpoint = 0, limits = c(-1, 1)) +
   labs(title = "Correlation between phyla (relative abundance)",
@@ -165,7 +165,7 @@ Principal Component Analysis summarises many correlated variables into a few
 axes. We ordinate samples by their phylum profile and colour by region.
 
 ```{r pca, fig.height=5}
-# prcomp() needs a plain numeric matrix with samples as ROW NAMES (not a column).
+# prcomp() needs a plain numeric matrix with samples as row names (not a column).
 mat <- phy_wide |> column_to_rownames("sample_id") |> as.matrix()
 
 pca <- prcomp(mat, scale. = TRUE)      # PCA; scale. = TRUE standardises each phylum first
@@ -202,7 +202,7 @@ ggplot(head(scree, 8), aes(pc, variance)) +   # first 8 axes are plenty to see t
   theme_minimal()
 ```
 
-> 📌 **Teaching note.** PCA (base R) and NMDS (from the capstone, via `vegan`) are
+> **Instructor note.** PCA (base R) and NMDS (from the capstone, via `vegan`) are
 > both ordinations. PCA is fast and linear; NMDS handles ecological
 > (Bray–Curtis) distances better. Showing both makes the concept stick.
 
@@ -214,5 +214,5 @@ ggplot(head(scree, 8), aes(pc, variance)) +   # first 8 axes are plenty to see t
 - `cor()` + a diverging fill scale reveals **relationships between variables**.
 - **`prcomp()`** gives a quick PCA ordination — all base R + ggplot2, CRAN-only.
 
-That closes the R refresher. From here, everything in the week is *more* of the
-same verbs and plots on richer data. Well done!
+That closes the R refresher. From here, everything in the week is more of the
+same verbs and plots on richer data.

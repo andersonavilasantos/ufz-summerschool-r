@@ -35,8 +35,9 @@ gives hints; you write the code in the blank chunk. A **collapsible solution**
 sits under each step — try first, peek if stuck. Steps build on each other, so
 run them in order.
 
-> ⏱️ Suggested time: 45–60 min. Steps 1–7 are core; 8–10 are extension.
-> 📌 **Teaching note.** Run as pair-programming: one drives, one navigates.
+> Suggested time: 45–60 min. Steps 1–7 are core; 8–10 are extension.
+
+> **Instructor note.** Run as pair-programming: one drives, one navigates.
 > Reveal each solution only after most pairs have attempted the step.
 
 ---
@@ -152,7 +153,7 @@ Because `meta_clean` dropped some samples, keep only rows that have metadata
 ```{r}
 ab_full <- ab_long |>
   left_join(taxonomy, by = "genus") |>                    # add phylum/family per genus
-  # inner_join keeps ONLY rows that match on both sides -> drops samples cleaned away.
+  # inner_join keeps only rows that match on both sides -> drops samples cleaned away.
   inner_join(select(meta_clean, sample_id, nationality, bmi_group, age),
              by = "sample_id")
 glimpse(ab_full)
@@ -186,7 +187,7 @@ per-sample abundance vector), or compute by hand.
 <details><summary><b>Solution: Step 4</b></summary>
 
 ```{r}
-# Group by sample (carrying its metadata) so summarise() gives ONE diversity row per sample.
+# Group by sample (carrying its metadata) so summarise() gives one diversity row per sample.
 alpha <- ab_full |>
   group_by(sample_id, nationality, bmi_group, age) |>
   summarise(
@@ -334,7 +335,7 @@ plot the two ordination axes coloured by region.
 <details><summary><b>Solution: Step 8</b></summary>
 
 ```{r nmds, results='hide', fig.height=5}
-# set.seed() fixes the random draw so everyone in class gets the SAME subset/ordination.
+# set.seed() fixes the random draw so everyone in class gets the same subset/ordination.
 set.seed(1)
 # Take a balanced subset: 40 random samples from each of four regions (fast enough live).
 sub_ids <- meta_clean |>
@@ -412,13 +413,13 @@ for age, rarefy to equal depth, test region with PERMANOVA `vegan::adonis2`).
 
 ## Wrap-up
 
-You just ran a complete microbial-ecology workflow in R: **import → clean →
-reshape → join → summarise → visualise → test → ordinate → export**. Every tool
-came from lessons 01–04; the only new thing was chaining them into an analysis.
+You have now run a complete microbial-ecology workflow in R: import, clean,
+reshape, join, summarise, visualise, test, ordinate, and export. Every tool came
+from lessons 01–04; the only new thing was chaining them into an analysis.
 
-Keep this notebook as a **template**: swap in your own feature table this week and
+Keep this notebook as a template. Swap in your own feature table this week and
 most of the code still applies.
 
-➡️ Want to see the whole thing written out, with every chunk filled in and all
-figures produced? Open **07 · Worked analysis** — the fully worked, read-and-run
-version of this capstone.
+To see the whole thing written out, with every chunk filled in and all figures
+produced, open **07 · Worked analysis**, the fully worked, read-and-run version of
+this capstone.

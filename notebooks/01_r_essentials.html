@@ -2890,12 +2890,12 @@ chunk</strong> and press <strong>Ctrl+Enter</strong> (Windows) /
 <strong>Cmd+Enter</strong> (Mac). To run a whole chunk, press the green
 ▶ button at its top-right.</p>
 <blockquote>
-<p>📌 <strong>Teaching note.</strong> Have participants run the very
+<p><strong>Instructor note.</strong> Have participants run the very
 first chunk below live. Seeing a number appear in the console is the
 “hello world” moment that makes R feel real.</p>
 </blockquote>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># Anything after a &#39;#&#39; is a COMMENT: R ignores it. Use comments generously.</span></span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co"># The line below is an EXPRESSION. Run it and R prints the result.</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># Anything after a &#39;#&#39; is a comment: R ignores it. Use comments generously.</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co"># The line below is an expression. Run it and R prints the result.</span></span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="dv">2</span> <span class="sc">+</span> <span class="dv">2</span></span>
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co">#&gt; [1] 4</span></span></code></pre></div>
 <hr />
@@ -2906,7 +2906,7 @@ first chunk below live. Seeing a number appear in the console is the
 arrow <code>&lt;-</code> (read it as “gets”). Typing the object’s name
 prints it.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Store the number of samples in our dataset in an object called n_samples.</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>n_samples <span class="ot">&lt;-</span> <span class="dv">1006</span>          <span class="co"># &#39;&lt;-&#39; is R&#39;s assignment arrow: put 1006 INTO n_samples</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>n_samples <span class="ot">&lt;-</span> <span class="dv">1006</span>          <span class="co"># &#39;&lt;-&#39; is R&#39;s assignment arrow: put 1006 into n_samples</span></span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>                           <span class="co"># (in R we use &#39;&lt;-&#39;, not &#39;=&#39;; think of it as &quot;gets&quot;)</span></span>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>n_samples                  <span class="co"># type an object&#39;s name on its own line -&gt; R prints it</span></span>
@@ -2918,18 +2918,18 @@ prints it.</p>
 <span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; [1] 130780</span></span></code></pre></div>
 <p>R has a few basic <strong>types</strong> of value. The function
 <code>class()</code> tells you which:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># class() reveals the TYPE of a value — getting types wrong is a top beginner bug.</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># class() reveals the type of a value; getting types wrong is a common beginner bug.</span></span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">class</span>(<span class="fl">3.14</span>)                <span class="co"># &quot;numeric&quot;  -&gt; numbers (decimals); R&#39;s default number type</span></span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;numeric&quot;</span></span>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="fu">class</span>(<span class="dv">42</span><span class="dt">L</span>)                 <span class="co"># &quot;integer&quot;  -&gt; a whole number; the trailing L forces integer</span></span>
 <span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;integer&quot;</span></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="fu">class</span>(<span class="st">&quot;Firmicutes&quot;</span>)        <span class="co"># &quot;character&quot;-&gt; text; ALWAYS wrapped in quotes, e.g. a taxon name</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="fu">class</span>(<span class="st">&quot;Firmicutes&quot;</span>)        <span class="co"># &quot;character&quot;-&gt; text; always wrapped in quotes, e.g. a taxon name</span></span>
 <span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;character&quot;</span></span>
 <span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="fu">class</span>(<span class="cn">TRUE</span>)                <span class="co"># &quot;logical&quot;  -&gt; TRUE / FALSE, the result of a yes/no test</span></span>
 <span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt; [1] &quot;logical&quot;</span></span></code></pre></div>
 <blockquote>
-<p>📌 <strong>Teaching note.</strong> Beginners mix up <code>=</code>
-and <code>&lt;-</code>. Both can assign, but the community convention is
+<p><strong>Instructor note.</strong> Beginners mix up <code>=</code> and
+<code>&lt;-</code>. Both can assign, but the community convention is
 <code>&lt;-</code> for assignment and <code>=</code> only for function
 arguments. Point out RStudio’s shortcut <strong>Alt+-</strong> which
 types <code>&lt;-</code> for you.</p>
@@ -2954,12 +2954,12 @@ holding the number <code>1523</code>. Then print each one’s
 <hr />
 </div>
 </div>
-<div id="vectors-the-heart-of-r" class="section level2">
-<h2>2 · Vectors — the heart of R</h2>
+<div id="vectors-rs-core-object" class="section level2">
+<h2>2 · Vectors — R’s core object</h2>
 <p>A <strong>vector</strong> is an ordered collection of values <em>of
 the same type</em>. You build one with <code>c()</code> (“combine”).
 Almost everything in R is a vector.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># c() = &quot;combine&quot;: glue values into a vector. All elements share ONE type.</span></span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># c() = &quot;combine&quot;: glue values into a vector. All elements share one type.</span></span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co"># Here: five common human-gut genera as a character (text) vector.</span></span>
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>genera <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Bacteroides&quot;</span>, <span class="st">&quot;Prevotella&quot;</span>, <span class="st">&quot;Faecalibacterium&quot;</span>,</span>
 <span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>            <span class="st">&quot;Escherichia&quot;</span>, <span class="st">&quot;Akkermansia&quot;</span>)</span>
@@ -2971,10 +2971,10 @@ Almost everything in R is a vector.</p>
 <span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>counts <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1820</span>, <span class="dv">640</span>, <span class="dv">2310</span>, <span class="dv">95</span>, <span class="dv">210</span>)   <span class="co"># element i is the count of genus i</span></span>
 <span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>counts</span>
 <span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; [1] 1820  640 2310   95  210</span></span></code></pre></div>
-<p>The magic of R: operations apply to <strong>every element at
-once</strong> (this is called <em>vectorisation</em>) — no loops
-needed.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Vectorisation: the operation is applied to EVERY element at once, no loop needed.</span></span>
+<p>A useful feature of R: operations apply to every element at once.
+This is called <em>vectorisation</em>, and it means you rarely need a
+loop.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Vectorisation: the operation is applied to every element at once, no loop needed.</span></span>
 <span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>counts <span class="sc">*</span> <span class="dv">2</span>            <span class="co"># multiply each count by 2 -&gt; a new 5-element vector</span></span>
 <span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co">#&gt; [1] 3640 1280 4620  190  420</span></span>
 <span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>counts <span class="sc">/</span> <span class="fu">sum</span>(counts)  <span class="co"># each count / the total = its proportion of the community</span></span>
@@ -2997,16 +2997,16 @@ needed.</p>
 <h3>2.1 · Indexing (picking elements)</h3>
 <p>R counts <strong>from 1</strong> (not 0). Use square brackets
 <code>[ ]</code> to pick elements.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Square brackets pick elements by position. R starts counting at 1 (not 0!).</span></span>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Square brackets pick elements by position. R starts counting at 1, not 0.</span></span>
 <span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>genera[<span class="dv">1</span>]            <span class="co"># the 1st genus (&quot;Bacteroides&quot;)</span></span>
 <span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Bacteroides&quot;</span></span>
 <span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>genera[<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>)]      <span class="co"># pass a vector of positions -&gt; the 1st and 3rd genera</span></span>
 <span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Bacteroides&quot;      &quot;Faecalibacterium&quot;</span></span>
 <span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>counts[counts <span class="sc">&gt;</span> <span class="dv">500</span>] <span class="co"># logical filter: keep only the counts greater than 500</span></span>
 <span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; [1] 1820  640 2310</span></span></code></pre></div>
-<p>That last line is powerful: <code>counts &gt; 500</code> produces
-<code>TRUE/FALSE</code>, and R keeps the <code>TRUE</code> positions.
-You will use this idea constantly.</p>
+<p>That last line does a lot of work: <code>counts &gt; 500</code>
+produces <code>TRUE/FALSE</code>, and R keeps the <code>TRUE</code>
+positions. You will use this idea constantly.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># The comparison itself produces a TRUE/FALSE vector, one entry per element:</span></span>
 <span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>counts <span class="sc">&gt;</span> <span class="dv">500</span>                 <span class="co"># TRUE where the count exceeds 500, FALSE otherwise</span></span>
 <span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="co">#&gt; [1]  TRUE  TRUE  TRUE FALSE FALSE</span></span>
@@ -3027,9 +3027,9 @@ unless you tell them to ignore it with <code>na.rm = TRUE</code>.</p>
 <span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="fu">is.na</span>(ages)                     <span class="co"># TRUE exactly at the missing position, FALSE elsewhere</span></span>
 <span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co">#&gt; [1] FALSE FALSE  TRUE FALSE FALSE</span></span></code></pre></div>
 <blockquote>
-<p>📌 <strong>Teaching note.</strong> <code>NA</code> is <em>not</em>
-zero and <em>not</em> the text “NA”. It is a first-class “unknown”. This
-distinction saves people from silent bugs later.</p>
+<p><strong>Instructor note.</strong> <code>NA</code> is not zero and not
+the text “NA”. It is a first-class “unknown”. This distinction saves
+people from silent bugs later.</p>
 </blockquote>
 </div>
 <div id="exercise-2" class="section level3">
@@ -3058,7 +3058,7 @@ Factors remember the full set of categories (“levels”) and control their
 order — which matters for tables and plots.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># Start with plain text categories (one BMI class per participant):</span></span>
 <span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>bmi <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;lean&quot;</span>, <span class="st">&quot;obese&quot;</span>, <span class="st">&quot;lean&quot;</span>, <span class="st">&quot;overweight&quot;</span>, <span class="st">&quot;obese&quot;</span>, <span class="st">&quot;lean&quot;</span>)</span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co"># factor() converts text -&gt; a factor; &#39;levels&#39; fixes the categories AND their order</span></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co"># factor() converts text -&gt; a factor; &#39;levels&#39; fixes the categories and their order</span></span>
 <span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co"># (we choose lean &lt; overweight &lt; obese, a meaningful order, not alphabetical).</span></span>
 <span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>bmi_f <span class="ot">&lt;-</span> <span class="fu">factor</span>(bmi, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;lean&quot;</span>, <span class="st">&quot;overweight&quot;</span>, <span class="st">&quot;obese&quot;</span>))</span>
 <span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>bmi_f</span>
@@ -3091,7 +3091,7 @@ returns.</p>
 <span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="co">#&gt; [1] 35.862069 12.610837 45.517241  1.871921  4.137931</span></span></code></pre></div>
 <p>Arguments can have <strong>defaults</strong>:</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># Shannon diversity — a real ecology metric we reuse all week.</span></span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="co"># &#39;base = exp(1)&#39; is a DEFAULT: if the caller omits base, natural log is used.</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="co"># &#39;base = exp(1)&#39; is a default: if the caller omits base, natural log is used.</span></span>
 <span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>shannon <span class="ot">&lt;-</span> <span class="cf">function</span>(counts, <span class="at">base =</span> <span class="fu">exp</span>(<span class="dv">1</span>)) {</span>
 <span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>  p <span class="ot">&lt;-</span> counts[counts <span class="sc">&gt;</span> <span class="dv">0</span>] <span class="sc">/</span> <span class="fu">sum</span>(counts)  <span class="co"># keep present taxa, convert to proportions</span></span>
 <span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>  <span class="sc">-</span><span class="fu">sum</span>(p <span class="sc">*</span> <span class="fu">log</span>(p, <span class="at">base =</span> base))          <span class="co"># the Shannon formula: -sum(p * log p)</span></span>
@@ -3132,12 +3132,12 @@ left-to-right, like a recipe.</p>
 <li><code>%&gt;%</code> — the <strong>magrittr</strong> pipe from the
 tidyverse. You will see it everywhere.</li>
 </ul>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># Without a pipe: calls nest inside each other, so you read INSIDE-OUT (awkward).</span></span>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># Without a pipe: calls nest inside each other, so you read inside-out (awkward).</span></span>
 <span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(counts), <span class="dv">1</span>)</span>
 <span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a><span class="co">#&gt; [1] 1015</span></span>
 <span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a></span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="co"># With the native pipe: read LEFT-TO-RIGHT. Read &#39;|&gt;&#39; as the word &quot;then&quot;.</span></span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>counts <span class="sc">|&gt;</span> <span class="fu">mean</span>() <span class="sc">|&gt;</span> <span class="fu">round</span>(<span class="dv">1</span>)   <span class="co"># take counts, THEN mean(), THEN round to 1 decimal</span></span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="co"># With the native pipe: read left-to-right. Read &#39;|&gt;&#39; as the word &quot;then&quot;.</span></span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>counts <span class="sc">|&gt;</span> <span class="fu">mean</span>() <span class="sc">|&gt;</span> <span class="fu">round</span>(<span class="dv">1</span>)   <span class="co"># take counts, then mean(), then round to 1 decimal</span></span>
 <span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a><span class="co">#&gt; [1] 1015</span></span></code></pre></div>
 <p>The tidyverse’s <code>%&gt;%</code> pipe (from
 <strong>magrittr</strong>) does the same thing. You will see it in
@@ -3151,7 +3151,7 @@ two are interchangeable for everything we do this session.</p>
 because it lets us write “filter, then group, then summarise” as one
 readable flow.</p>
 <blockquote>
-<p>📌 <strong>Teaching note.</strong> Type the pipe with
+<p><strong>Instructor note.</strong> Type the pipe with
 <strong>Ctrl+Shift+M</strong>. In RStudio you can set <em>Tools ▸ Global
 Options ▸ Code</em> to make that shortcut insert the native
 <code>|&gt;</code>.</p>

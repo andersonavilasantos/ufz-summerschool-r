@@ -23,18 +23,18 @@ knitr::opts_chunk$set(echo = TRUE, collapse = TRUE, comment = "#>",
 
 ## What this notebook is
 
-This is a **fully worked, read-and-run analysis** — the *reference* companion to
-the fill-in **05 · Capstone**. Every chunk is already written: read it top to
-bottom, run it, and watch a complete microbial-ecology study come together on the
-real **HITChip Atlas** human-gut dataset. Nothing is hidden behind a blank.
+This is a fully worked, read-and-run analysis, the reference companion to the
+fill-in **05 · Capstone**. Every chunk is already written: read it top to bottom
+and run it to follow a complete microbial-ecology study on the real HITChip Atlas
+human-gut dataset. Nothing is hidden behind a blank.
 
-> 📌 **Teaching note.** Use this two ways: (1) as the **instructor's live demo**
-> — knit it once, then walk the class through each figure; or (2) as a
-> **worked solution** students read *after* attempting the capstone in pairs.
-> The capstone (05) asks you to *write* this; here you get to *study* it.
+> **Instructor note.** Use this two ways: (1) as the instructor's live demo, where
+> you knit it once and then walk the class through each figure; or (2) as a worked
+> solution students read after attempting the capstone in pairs. The capstone (05)
+> asks you to write this; here you get to study it.
 
-**The arc — the same seven verbs you will repeat all week:**
-**import → clean → wrangle → summarise → visualise → test → ordinate → export.**
+The arc is the same set of steps you will repeat all week: import, clean,
+wrangle, summarise, visualise, test, ordinate, export.
 
 Everything uses only tools from lessons **01–04** (readr, dplyr, tidyr, ggplot2,
 forcats) plus **vegan** for diversity and ordination. CRAN only.
@@ -56,7 +56,7 @@ library(vegan)     # community ecology: diversity + ordination
 data_dir <- if (file.exists("../data/sample_metadata.csv")) "../data" else "data"
 meta     <- read_csv(file.path(data_dir, "sample_metadata.csv"))  # one row per participant
 taxonomy <- read_csv(file.path(data_dir, "taxonomy.csv"))         # genus -> phylum / family
-abund    <- read_csv(file.path(data_dir, "genus_abundance.csv"))  # WIDE: sample_id + one col per genus
+abund    <- read_csv(file.path(data_dir, "genus_abundance.csv"))  # wide: sample_id + one col per genus
 
 # cat() prints the dimensions so we can sanity-check each table loaded correctly.
 cat("metadata :", nrow(meta),  "x", ncol(meta),  "\n")
@@ -91,16 +91,16 @@ bmi_levels <- c("underweight","lean","overweight",
 
 meta_clean <- meta |>
   filter(!is.na(age), !is.na(bmi_group)) |>                    # keep only fully-labelled samples
-  # factor(..., levels=) makes bmi_group ORDERED: plots/tables follow underweight -> morbidobese,
+  # factor(..., levels=) makes bmi_group ordered: plots/tables follow underweight -> morbidobese,
   # not alphabetical order (a classic R gotcha — character columns sort A-Z by default).
   mutate(bmi_group = factor(bmi_group, levels = bmi_levels))
 
 cat("kept", nrow(meta_clean), "of", nrow(meta), "samples after cleaning\n")
 ```
 
-> 📌 **Teaching note.** Cleaning is not optional busywork — dropping the
-> unlabelled rows *now* means every downstream `group_by` is honest. Show the
-> class the before/after sample count so they see the cost of missing data.
+> **Instructor note.** Cleaning is not optional busywork. Dropping the unlabelled
+> rows now means every downstream `group_by` is honest. Show the class the
+> before/after sample count so they see the cost of missing data.
 
 ---
 
@@ -205,9 +205,9 @@ p_comp
 composition |> group_by(nationality) |> slice_max(mean_rel, n = 1)
 ```
 
-> 📌 **Teaching note.** Point out that **Firmicutes** dominates everywhere —
-> exactly what the literature reports for the healthy Western gut — and that the
-> Firmicutes/Bacteroidetes ratio is the variable most microbiome papers fixate on.
+> **Instructor note.** Point out that Firmicutes dominates everywhere, exactly
+> what the literature reports for the healthy Western gut, and that the
+> Firmicutes/Bacteroidetes ratio is the variable most microbiome papers focus on.
 
 ---
 
@@ -287,10 +287,10 @@ p_nmds <- ggplot(scores_df, aes(NMDS1, NMDS2, colour = nationality)) +
 p_nmds
 ```
 
-> 📌 **Teaching note.** A **stress** below ~0.2 means the 2-D picture is a fair
-> summary of the true distances. Overlapping ellipses = communities are similar
-> across regions; separated ellipses = regional structure. This is the same
-> ordination logic as the PCA in lesson 06 — different distance, same idea.
+> **Instructor note.** A stress below about 0.2 means the 2-D picture is a fair
+> summary of the true distances. Overlapping ellipses mean communities are similar
+> across regions; separated ellipses mean regional structure. This is the same
+> ordination logic as the PCA in lesson 06, with a different distance.
 
 ---
 
@@ -321,7 +321,7 @@ cat("Wrote worked_alpha_diversity.csv and worked_phylum_by_region.csv\n")
 
 ---
 
-## Recap — the whole analysis in one breath
+## Recap — the whole analysis
 
 We took a real, published human-gut dataset from raw tables to defensible
 conclusions:
@@ -334,6 +334,6 @@ conclusions:
   communities with **NMDS**.
 - **Exported** three figures and two result tables.
 
-Every verb came from lessons 01–04; the only new idea was **chaining them into a
-study**. Now flip to **05 · Capstone** and write this yourself — or swap in your
-own feature table this week, and most of this code still applies.
+Every verb came from lessons 01–04; the only new idea was chaining them into a
+study. Now flip to **05 · Capstone** and write this yourself, or swap in your own
+feature table this week, and most of this code still applies.
