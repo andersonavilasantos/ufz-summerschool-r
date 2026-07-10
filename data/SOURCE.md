@@ -32,7 +32,7 @@ legally required.
 CC0 summary: https://creativecommons.org/publicdomain/zero/1.0/
 
 > Note: the CC0 dedication covers the **dataset**. The teaching materials in
-> this repository (the `.Rmd` lessons, README, scripts) are separately licensed
+> this repository (the notebooks, README, scripts) are separately licensed
 > under **CC BY 3.0** — see the top-level `LICENSE` file.
 
 ## Files in this folder
